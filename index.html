@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ashley's Paycheck Budget</title>
+<style>
+:root {
+  --bg:#160027; --panel:#3b0b66; --panel2:#fff0fb; --line:#ff8bea;
+  --text:#ffffff; --dark:#281044; --muted:#ffe3fb; --pink:#ff42b3;
+  --hotpink:#ff1493; --purple:#8d38ff; --blue:#28c7ff;
+  --green:#22c55e; --red:#ff2768; --orange:#ffb000; --yellow:#ffe66d;
+}
+* {box-sizing:border-box;}
+body {
+  margin:0; padding:24px; font-family:Arial, Helvetica, sans-serif; color:var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,117,235,.55), transparent 18%),
+    radial-gradient(circle at 85% 8%, rgba(40,199,255,.45), transparent 18%),
+    radial-gradient(circle at 50% 40%, rgba(141,56,255,.5), transparent 35%),
+    linear-gradient(135deg,#12001f,#3b0066 45%,#09001a);
+  overflow-x:hidden;
+}
+body::before {
+  content:"✨ 💖 ✨ 🦄 ✨ 💗 ✨"; position:fixed; top:8px; left:0; right:0;
+  text-align:center; opacity:.55; font-size:22px; pointer-events:none;
+}
+header {max-width:1400px; margin:0 auto 20px; text-align:center;}
+h1 {
+  margin:18px 0 6px; font-size:48px; color:#fff;
+  text-shadow:0 0 8px #ff4bd8,0 0 18px #8d38ff,0 0 28px #28c7ff;
+}
+.ashley-name {
+  font-size:1.35em; font-weight:900; color:#fff;
+  text-shadow:0 0 10px #ff4bd8,0 0 22px #ff1493,0 0 34px #28c7ff;
+}
+.sub {margin:0; color:#fff0fb; font-size:17px; font-weight:700;}
+.kpis {
+  max-width:1400px; margin:18px auto; display:grid;
+  grid-template-columns:repeat(5,minmax(150px,1fr)); gap:12px;
+}
+.kpi {
+  background:linear-gradient(145deg,#ff42b3,#8d38ff); border:2px solid #ffb7f2;
+  border-radius:20px; padding:18px;
+  box-shadow:0 0 18px rgba(255,66,179,.55), inset 0 0 18px rgba(255,255,255,.18);
+}
+.kpi:nth-child(3) {background:linear-gradient(145deg,#28c7ff,#7b2cff);}
+.kpi:nth-child(4) {background:linear-gradient(145deg,#8d38ff,#ff42b3);}
+.kpi span {display:block; color:#fff; font-size:13px; font-weight:900; margin-bottom:8px; text-transform:uppercase;}
+.kpi strong {font-size:25px; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.35);}
+.cancelled {
+  max-width:1400px; margin:0 auto 18px; padding:16px 20px;
+  background:linear-gradient(90deg,#5a1192,#ff42b3,#5a1192);
+  border:2px solid #ffb7f2; border-radius:20px; box-shadow:0 0 18px rgba(255,66,179,.45);
+}
+.cancelled h3 {margin:0 0 10px; font-size:20px;}
+.cancelled ul {margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cancelled li {padding:12px; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);}
+.cancelled li span {display:block; color:#fff; font-weight:800;}
+.cancelled li strong {color:#ffe66d;}
+.month-grid {
+  max-width:1400px; margin:0 auto; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; align-items:start;
+}
+.month-col {
+  background:#fff3fb; color:var(--dark); border:3px solid #ff8bea;
+  border-radius:22px; overflow:hidden; box-shadow:0 0 20px rgba(255,66,179,.55);
+}
+.month-col h2 {
+  margin:0; padding:12px; font-size:27px; text-align:center; color:#fff;
+  background:linear-gradient(90deg,#8d38ff,#ff42b3); text-shadow:0 0 8px rgba(255,255,255,.8);
+}
+.month-summary {display:flex; flex-direction:column; gap:5px; padding:14px; font-size:14px; font-weight:900;}
+.blue-text {color:#0069cc;} .green-text {color:#168a32;} .red-text {color:#e00057;} .orange-text {color:#c67400;}
+.pay-card {margin:10px 12px; border-radius:14px; overflow:hidden; box-shadow:0 4px 12px rgba(120,0,120,.25);}
+.pay-toggle {
+  width:100%; border:0; color:#fff; padding:13px; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center; text-align:left;
+}
+.pay-toggle.purple {background:linear-gradient(90deg,#8d38ff,#bd65ff);}
+.pay-toggle.pink {background:linear-gradient(90deg,#ff1493,#ff66bd);}
+.pay-toggle strong {display:block; font-size:18px;}
+.pay-toggle small {display:block; color:#fff; font-weight:700; margin-top:3px;}
+.pay-toggle b {font-size:22px;}
+.pay-details {display:none; padding:10px; background:#fff;}
+.pay-card.open .pay-details {display:block;}
+.mini-toggle {
+  width:100%; margin:8px 0 0; border:0; color:#fff; padding:11px 12px;
+  border-radius:12px; cursor:pointer; display:flex; justify-content:space-between;
+  font-size:15px; font-weight:900;
+}
+.mini-toggle.red {background:linear-gradient(90deg,#ff2768,#ff6ba3);}
+.mini-toggle.orange {background:linear-gradient(90deg,#ffb000,#ff7ad9);}
+.mini-toggle.green {background:linear-gradient(90deg,#22c55e,#28c7ff);}
+.section-list {display:none; margin:6px 0 8px; padding:0; list-style:none; border-radius:10px; overflow:hidden;}
+.section-list.open {display:block;}
+.section-list li {
+  display:flex; justify-content:space-between; gap:10px; padding:9px; font-size:13px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.section-list li span {color:#351550; font-weight:700;}
+.section-list li strong {white-space:nowrap; font-weight:900;}
+.red-list li {background:#ffe2ee;} .red-list strong {color:#d60054;}
+.orange-list li {background:#fff1d1;} .orange-list strong {color:#ba6900;}
+.green-list li {background:#dcffe9;} .green-list strong {color:#168a32;}
+footer {max-width:1400px; margin:18px auto 0; color:#fff0fb; font-size:13px; text-align:center; font-weight:700;}
+@media (max-width:850px) {
+  body {padding:12px;} h1 {font-size:36px;} .kpis {grid-template-columns:1fr 1fr;}
+  .cancelled ul {grid-template-columns:1fr;}
+  .month-summary span {font-size:21px !important; font-weight:900 !important; line-height:1.45 !important;}
+  .mini-toggle {font-size:20px !important; padding:16px 14px !important;}
+  .mini-toggle strong {font-size:20px !important;}
+  .pay-toggle strong {font-size:24px !important;}
+  .pay-toggle small {font-size:17px !important;}
+  .section-list li {font-size:17px !important; padding:13px 10px !important;}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🦄 <span class="ashley-name">Ashley</span>'s Paycheck Budget ✨</h1>
+  <p class="sub">Clickable 12-month budget view. Includes Gas &amp; Groceries and Spenna Cash. 💖✨</p>
+</header>
+
+<section class="kpis">
+  <div class="kpi"><span>12-Month Paychecks</span><strong>$36,478.62</strong></div>
+  <div class="kpi"><span>12-Month Bills</span><strong>$16,684.60</strong></div>
+  <div class="kpi"><span>12-Month Spending</span><strong>$9,450.00</strong></div>
+  <div class="kpi"><span>12-Month Left</span><strong>$10,344.02</strong></div>
+  <div class="kpi"><span>Monthly Avg Left</span><strong>$862.00</strong></div>
+</section>
+
+<section class="cancelled">
+  <h3>💖 Spending Plan</h3>
+  <ul>
+    <li><span>Gas &amp; Groceries</span><strong>$200/check</strong></li>
+    <li><span>Spenna Cash</span><strong>$150/check</strong></li>
+    <li><span>Planet Fitness</span><strong>Cancelled</strong></li>
+    <li><span>Savings Goal</span><strong>Left amount</strong></li>
+  </ul>
+</section>
+
+<main class="month-grid">
+  
+    <section class="month-col">
+      <h2>💗 June 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Jun 12 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Jun 26 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 July 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Jul 10 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Jul 24 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 August 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Aug 7 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Aug 21 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 September 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Sep 4 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Sep 18 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 October 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $4,053.18</span>
+        <span class="red-text">Bills $1,785.64</span>
+        <span class="orange-text">Spend $1,050.00</span>
+        <span class="green-text">Left $1,217.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Oct 2 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Oct 16 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #3</strong>
+              <small>Oct 30 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 November 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Nov 13 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Nov 27 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 December 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Dec 11 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Dec 25 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 January 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Jan 8 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Jan 22 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 February 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Feb 5 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Feb 19 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 March 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Mar 5 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Mar 19 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 April 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $4,053.18</span>
+        <span class="red-text">Bills $1,939.10</span>
+        <span class="orange-text">Spend $1,050.00</span>
+        <span class="green-text">Left $1,064.08</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Apr 2 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>Apr 16 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #3</strong>
+              <small>Apr 30 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 May 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Left $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>May 14 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #2</strong>
+              <small>May 28 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$303.54</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 June 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $1,351.06</span>
+        <span class="red-text">Bills $544.06</span>
+        <span class="orange-text">Spend $350.00</span>
+        <span class="green-text">Left $457.00</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Paycheck #1</strong>
+              <small>Jun 11 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Left <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Left after bills and spending</span><strong>$457.00</strong></li>
+              <li><span>🦄 Savings / cushion amount</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+</main>
+
+<footer>
+  ✨ “Left” means money remaining after known bills, Gas &amp; Groceries, and Spenna Cash. 🦄💖
+</footer>
+
+<script>
+function toggleCard(btn) {
+  btn.closest('.pay-card').classList.toggle('open');
+}
+function toggleSection(btn) {
+  const list = btn.nextElementSibling;
+  if (list) list.classList.toggle('open');
+}
+</script>
+</body>
+</html>
