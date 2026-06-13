@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ashley's Pay Budget</title>
+<style>
+:root {
+  --bg:#160027; --panel:#3b0b66; --panel2:#fff0fb; --line:#ff8bea;
+  --text:#ffffff; --dark:#281044; --muted:#ffe3fb; --pink:#ff42b3;
+  --hotpink:#ff1493; --purple:#8d38ff; --blue:#28c7ff;
+  --green:#22c55e; --red:#ff2768; --orange:#ffb000; --yellow:#ffe66d;
+}
+* {box-sizing:border-box;}
+body {
+  margin:0; padding:24px; font-family:Arial, Helvetica, sans-serif; color:var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,117,235,.55), transparent 18%),
+    radial-gradient(circle at 85% 8%, rgba(40,199,255,.45), transparent 18%),
+    radial-gradient(circle at 50% 40%, rgba(141,56,255,.5), transparent 35%),
+    linear-gradient(135deg,#12001f,#3b0066 45%,#09001a);
+  overflow-x:hidden;
+}
+body::before {
+  content:"✨ 💖 ✨ 🦄 ✨ 💗 ✨"; position:fixed; top:8px; left:0; right:0;
+  text-align:center; opacity:.55; font-size:22px; pointer-events:none;
+}
+header {max-width:1400px; margin:0 auto 20px; text-align:center;}
+h1 {
+  margin:18px 0 6px; font-size:48px; color:#fff;
+  text-shadow:0 0 8px #ff4bd8,0 0 18px #8d38ff,0 0 28px #28c7ff;
+}
+.ashley-name {
+  font-size:1.35em; font-weight:900; color:#fff;
+  text-shadow:0 0 10px #ff4bd8,0 0 22px #ff1493,0 0 34px #28c7ff;
+}
+.sub {margin:0; color:#fff0fb; font-size:17px; font-weight:700;}
+.kpis {
+  max-width:1400px; margin:18px auto; display:grid;
+  grid-template-columns:repeat(5,minmax(150px,1fr)); gap:12px;
+}
+.kpi {
+  background:linear-gradient(145deg,#ff42b3,#8d38ff); border:2px solid #ffb7f2;
+  border-radius:20px; padding:18px;
+  box-shadow:0 0 18px rgba(255,66,179,.55), inset 0 0 18px rgba(255,255,255,.18);
+}
+.kpi:nth-child(3) {background:linear-gradient(145deg,#28c7ff,#7b2cff);}
+.kpi:nth-child(4) {background:linear-gradient(145deg,#8d38ff,#ff42b3);}
+.kpi span {display:block; color:#fff; font-size:13px; font-weight:900; margin-bottom:8px; text-transform:uppercase;}
+.kpi strong {font-size:25px; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.35);}
+.cancelled {
+  max-width:1400px; margin:0 auto 18px; padding:16px 20px;
+  background:linear-gradient(90deg,#5a1192,#ff42b3,#5a1192);
+  border:2px solid #ffb7f2; border-radius:20px; box-shadow:0 0 18px rgba(255,66,179,.45);
+}
+.cancelled h3 {margin:0 0 10px; font-size:20px;}
+.cancelled ul {margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cancelled li {padding:12px; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);}
+.cancelled li span {display:block; color:#fff; font-weight:800;}
+.cancelled li strong {color:#ffe66d;}
+.month-grid {
+  max-width:1400px; margin:0 auto; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; align-items:start;
+}
+.month-col {
+  background:#fff3fb; color:var(--dark); border:3px solid #ff8bea;
+  border-radius:22px; overflow:hidden; box-shadow:0 0 20px rgba(255,66,179,.55);
+}
+.month-col h2 {
+  margin:0; padding:12px; font-size:27px; text-align:center; color:#fff;
+  background:linear-gradient(90deg,#8d38ff,#ff42b3); text-shadow:0 0 8px rgba(255,255,255,.8);
+}
+.month-summary {display:flex; flex-direction:column; gap:5px; padding:14px; font-size:14px; font-weight:900;}
+.blue-text {color:#0069cc;} .green-text {color:#168a32;} .red-text {color:#e00057;} .orange-text {color:#c67400;}
+.pay-card {margin:10px 12px; border-radius:14px; overflow:hidden; box-shadow:0 4px 12px rgba(120,0,120,.25);}
+.pay-toggle {
+  width:100%; border:0; color:#fff; padding:13px; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center; text-align:left;
+}
+.pay-toggle.purple {background:linear-gradient(90deg,#8d38ff,#bd65ff);}
+.pay-toggle.pink {background:linear-gradient(90deg,#ff1493,#ff66bd);}
+.pay-toggle strong {display:block; font-size:18px;}
+.pay-toggle small {display:block; color:#fff; font-weight:700; margin-top:3px;}
+.pay-toggle b {font-size:22px;}
+.pay-details {display:none; padding:10px; background:#fff;}
+.pay-card.open .pay-details {display:block;}
+.mini-toggle {
+  width:100%; margin:8px 0 0; border:0; color:#fff; padding:11px 12px;
+  border-radius:12px; cursor:pointer; display:flex; justify-content:space-between;
+  font-size:15px; font-weight:900;
+}
+.mini-toggle.red {background:linear-gradient(90deg,#ff2768,#ff6ba3);}
+.mini-toggle.orange {background:linear-gradient(90deg,#ffb000,#ff7ad9);}
+.mini-toggle.green {background:linear-gradient(90deg,#22c55e,#28c7ff);}
+.section-list {display:none; margin:6px 0 8px; padding:0; list-style:none; border-radius:10px; overflow:hidden;}
+.section-list.open {display:block;}
+.section-list li {
+  display:flex; justify-content:space-between; gap:10px; padding:9px; font-size:13px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.section-list li span {color:#351550; font-weight:700;}
+.section-list li strong {white-space:nowrap; font-weight:900;}
+.red-list li {background:#ffe2ee;} .red-list strong {color:#d60054;}
+.orange-list li {background:#fff1d1;} .orange-list strong {color:#ba6900;}
+.green-list li {background:#dcffe9;} .green-list strong {color:#168a32;}
+footer {max-width:1400px; margin:18px auto 0; color:#fff0fb; font-size:13px; text-align:center; font-weight:700;}
+@media (max-width:850px) {
+  body {padding:12px;} h1 {font-size:36px;} .kpis {grid-template-columns:1fr 1fr;}
+  .cancelled ul {grid-template-columns:1fr;}
+  .month-summary span {font-size:21px !important; font-weight:900 !important; line-height:1.45 !important;}
+  .mini-toggle {font-size:20px !important; padding:16px 14px !important;}
+  .mini-toggle strong {font-size:20px !important;}
+  .pay-toggle strong {font-size:24px !important;}
+  .pay-toggle small {font-size:17px !important;}
+  .section-list li {font-size:17px !important; padding:13px 10px !important;}
+}
+
+.glitter-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: glitter-pop 900ms ease-out forwards;
+  box-shadow: 0 0 12px currentColor;
+}
+@keyframes glitter-pop {
+  0% { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(.2) rotate(260deg); }
+}
+
+
+.bill-tools {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:8px 0;
+}
+.bill-tools button {
+  border:1px solid var(--line);
+  background:#050505;
+  color:var(--text);
+  border-radius:10px;
+  padding:8px 10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.bill-progress {
+  height:10px;
+  background:#111;
+  border:1px solid var(--line);
+  border-radius:999px;
+  overflow:hidden;
+  margin:8px 0;
+}
+.bill-progress-fill {
+  height:100%;
+  width:0%;
+  background:var(--green);
+  box-shadow:0 0 12px rgba(0,255,102,.8);
+  transition:width .25s ease;
+}
+.bill-paid-toggle {
+  width:26px;
+  height:26px;
+  min-width:26px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:#050505;
+  color:var(--muted);
+  cursor:pointer;
+  font-weight:900;
+  margin-right:8px;
+}
+.red-list li {
+  align-items:center;
+}
+.red-list li.paid {
+  opacity:.62;
+}
+.red-list li.paid span {
+  text-decoration:line-through;
+}
+.red-list li.paid .bill-paid-toggle {
+  background:var(--green);
+  color:#000;
+  box-shadow:0 0 10px rgba(0,255,102,.7);
+}
+.red-list li strong {
+  cursor:pointer;
+}
+.bill-status {
+  margin:6px 0 8px;
+  padding:8px;
+  border-radius:10px;
+  background:rgba(0,255,102,.08);
+  border:1px solid rgba(0,255,102,.18);
+  color:var(--green);
+  font-size:12px;
+  font-weight:900;
+}
+@media (max-width:850px) {
+  .bill-paid-toggle {
+    width:34px;
+    height:34px;
+    min-width:34px;
+    font-size:18px;
+  }
+  .bill-status, .bill-tools button {
+    font-size:17px !important;
+  }
+}
+
+
+.pay-income-edit {
+  cursor:pointer;
+  color:inherit;
+  border-bottom:1px dashed currentColor;
+}
+.pay-income-edit:hover {
+  text-shadow:0 0 10px currentColor;
+}
+
+
+
+.pay-income-edit {
+  color:#28c7ff !important;
+  font-weight:900 !important;
+  border-bottom:2px dashed #28c7ff !important;
+  text-shadow:0 0 8px #28c7ff, 0 0 18px #28c7ff, 0 0 30px #8d38ff;
+  animation: blueIncomeGlow 1.6s ease-in-out infinite alternate;
+}
+.pay-income-edit::before {
+  content:"✨ ";
+}
+.pay-income-edit::after { content:""; }
+@keyframes blueIncomeGlow {
+  from {
+    filter:brightness(1);
+    text-shadow:0 0 6px #28c7ff, 0 0 14px #28c7ff, 0 0 22px #8d38ff;
+  }
+  to {
+    filter:brightness(1.35);
+    text-shadow:0 0 10px #ffffff, 0 0 24px #28c7ff, 0 0 42px #00e5ff;
+  }
+}
+
+
+.section-list li strong {
+  cursor:pointer;
+  border-bottom:1px dashed currentColor;
+}
+.section-list li strong:hover {
+  filter:brightness(1.25);
+}
+
+
+.actual-savings-edit {
+  cursor:pointer;
+  color:var(--green) !important;
+  font-weight:900 !important;
+  border-bottom:1px dashed currentColor;
+  text-shadow:0 0 10px rgba(0,255,102,.55);
+}
+.actual-savings-row {
+  background:rgba(0,255,102,.12) !important;
+}
+
+
+.fund-tracker {
+  width:100%;
+  margin-top:8px;
+  padding:8px;
+  border-radius:10px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+}
+.fund-tracker-row {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:12px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+.fund-spent-edit {
+  cursor:pointer;
+  border-bottom:1px dashed currentColor;
+}
+.fund-progress {
+  height:10px;
+  background:rgba(0,0,0,.35);
+  border-radius:999px;
+  overflow:hidden;
+}
+.fund-progress-fill {
+  height:100%;
+  width:0%;
+  background:var(--green);
+  box-shadow:0 0 10px currentColor;
+  transition:width .25s ease;
+}
+.fund-progress-fill.warn { background:#ffb84d; }
+.fund-progress-fill.danger { background:var(--red); }
+@media (max-width:850px) {
+  .fund-tracker-row {font-size:16px !important;}
+  .fund-progress {height:14px;}
+}
+
+
+.fund-summary-line {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:13px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+.fund-receipt-log {
+  margin-top:6px;
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.35;
+}
+.fund-add-receipt {
+  margin-top:7px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.35);
+  color:var(--text);
+  border-radius:8px;
+  padding:6px 8px;
+  font-weight:900;
+  cursor:pointer;
+}
+@media (max-width:850px) {
+  .fund-summary-line {font-size:16px !important;}
+  .fund-receipt-log {font-size:14px !important;}
+  .fund-add-receipt {font-size:15px !important;}
+}
+
+
+.fund-entry-box {
+  width:100%;
+  margin-top:8px;
+  padding:9px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(0,0,0,.45);
+  color:var(--text);
+  font-weight:900;
+}
+.fund-entry-box::placeholder {
+  color:var(--muted);
+}
+.fund-percent {
+  font-weight:900;
+}
+
+
+/* Full-width fund tracking layout */
+.orange-list li {
+  display:block !important;
+}
+.orange-list li > span,
+.orange-list li > strong {
+  display:inline-block;
+  vertical-align:top;
+}
+.orange-list li > span {
+  width:calc(100% - 110px);
+}
+.orange-list li > strong {
+  width:105px;
+  text-align:right;
+}
+.fund-tracker {
+  display:block !important;
+  width:100% !important;
+  clear:both !important;
+  margin-top:10px !important;
+  padding:10px !important;
+  border-radius:10px !important;
+  background:rgba(255,255,255,.07) !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+}
+.fund-summary-line {
+  display:flex !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+  margin-bottom:6px !important;
+}
+.fund-progress {
+  height:12px !important;
+  background:rgba(0,0,0,.38) !important;
+  border-radius:999px !important;
+  overflow:hidden !important;
+  margin:8px 0 !important;
+}
+.fund-progress-fill {
+  height:100% !important;
+  width:0%;
+  background:var(--green) !important;
+  box-shadow:0 0 10px currentColor !important;
+  transition:width .25s ease !important;
+}
+.fund-progress-fill.warn { background:#ffb84d !important; }
+.fund-progress-fill.danger { background:var(--red) !important; }
+.fund-entry-box {
+  display:block !important;
+  width:100% !important;
+  margin-top:8px !important;
+  padding:10px !important;
+  border-radius:9px !important;
+  border:1px solid rgba(255,255,255,.25) !important;
+  background:rgba(0,0,0,.45) !important;
+  color:var(--text) !important;
+  font-weight:900 !important;
+  font-size:16px !important;
+}
+@media (max-width:850px) {
+  .orange-list li > span,
+  .orange-list li > strong {
+    font-size:17px !important;
+  }
+  .fund-summary-line {
+    font-size:17px !important;
+    line-height:1.35 !important;
+  }
+  .fund-progress {
+    height:15px !important;
+  }
+  .fund-entry-box {
+    font-size:17px !important;
+    padding:12px !important;
+  }
+}
+
+
+.number-modal-backdrop {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:99999;
+}
+.number-modal {
+  width:min(92vw,380px);
+  padding:18px;
+  border-radius:16px;
+  background:var(--panel2);
+  border:1px solid var(--line);
+  box-shadow:0 0 25px rgba(0,255,102,.25);
+}
+.number-modal label {
+  display:block;
+  font-weight:900;
+  margin-bottom:10px;
+  color:var(--text);
+}
+.number-modal input {
+  width:100%;
+  padding:14px;
+  font-size:22px;
+  font-weight:900;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#000;
+  color:var(--text);
+}
+.number-modal-actions {
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.number-modal-actions button {
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  font-weight:900;
+  cursor:pointer;
+}
+
+
+.fund-entry-display {
+  margin-top:8px;
+  padding:8px;
+  border-radius:9px;
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.16);
+  font-weight:900;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+}
+.fund-entry-actions {
+  display:flex;
+  gap:6px;
+}
+.fund-entry-actions button {
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:8px;
+  padding:5px 8px;
+  font-weight:900;
+  cursor:pointer;
+}
+.fund-edit-btn { background:rgba(255,184,77,.35); color:var(--text); }
+.fund-remove-btn { background:rgba(255,39,104,.35); color:var(--text); }
+@media (max-width:850px) {
+  .fund-entry-display {font-size:16px !important;}
+  .fund-entry-actions button {font-size:14px !important; padding:7px 9px !important;}
+}
+
+
+.fund-entry-box {
+  margin-bottom:8px !important;
+}
+.fund-entry-list {
+  margin-top:8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.fund-entry-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border-radius:8px;
+  background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,255,255,.14);
+  font-weight:900;
+}
+.fund-entry-item button {
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:7px;
+  padding:4px 7px;
+  font-weight:900;
+  cursor:pointer;
+}
+.fund-entry-edit { background:rgba(255,184,77,.35); color:var(--text); }
+.fund-entry-remove { background:rgba(255,39,104,.35); color:var(--text); }
+@media (max-width:850px) {
+  .fund-entry-item {font-size:15px !important;}
+  .fund-entry-item button {font-size:13px !important;}
+}
+
+
+.pay-left-line {
+  display:block;
+  margin-top:4px;
+  color:var(--green) !important;
+  font-weight:900 !important;
+}
+
+
+.pay-left-line {
+  display:block !important;
+  margin-top:6px !important;
+  font-size:.72em !important;
+  line-height:1.25 !important;
+  color:var(--green) !important;
+  font-weight:900 !important;
+}
+.pay-left-line span {
+  display:block !important;
+}
+@media (max-width:850px) {
+  .pay-left-line {
+    font-size:15px !important;
+    line-height:1.3 !important;
+  }
+}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>🦄 <span class="ashley-name">Ashley</span>'s Pay Budget ✨</h1>
+  <p class="sub">Clickable 12-month budget view. Includes Gas &amp; Groceries and Spenna Cash. 💖✨</p>
+</header>
+
+<section class="kpis">
+  <div class="kpi"><span>Saved</span><strong class="green-text actual-savings-total">$0.00</strong></div>
+  <div class="kpi"><span>12-Month Pays</span><strong>$36,478.62</strong></div>
+  <div class="kpi"><span>12-Month Bills</span><strong>$16,684.60</strong></div>
+  <div class="kpi"><span>12-Month Spending</span><strong>$9,450.00</strong></div>
+  <div class="kpi"><span>12-Month Savings</span><strong>$10,344.02</strong></div>
+  <div class="kpi"><span>Monthly Avg Savings</span><strong>$862.00</strong></div>
+</section>
+
+<section class="cancelled">
+  <h3>💖 Spending Plan</h3>
+  <ul>
+    <li><span>Gas &amp; Groceries</span><strong>$200/check</strong></li>
+    <li><span>Spenna Cash</span><strong>$150/check</strong></li>
+    <li><span>Planet Fitness</span><strong>Cancelled</strong></li>
+    <li><span>Savings Goal</span><strong>Savings</strong></li>
+  </ul>
+</section>
+
+<main class="month-grid">
+  
+    <section class="month-col">
+      <h2>💗 June 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Jun 12 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Jun 26 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 July 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Jul 10 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Jul 24 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 August 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Aug 7 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Aug 21 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 September 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Sep 4 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Sep 18 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 October 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $4,053.18</span>
+        <span class="red-text">Bills $1,785.64</span>
+        <span class="orange-text">Spend $1,050.00</span>
+        <span class="green-text">Savings $1,217.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Oct 2 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Oct 16 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #3</strong>
+              <small>Oct 30 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 November 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Nov 13 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Nov 27 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 December 2026 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Dec 11 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Dec 25 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 January 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Jan 8 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Jan 22 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 February 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Feb 5 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Feb 19 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 March 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Mar 5 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Mar 19 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 April 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $4,053.18</span>
+        <span class="red-text">Bills $1,939.10</span>
+        <span class="orange-text">Spend $1,050.00</span>
+        <span class="green-text">Savings $1,064.08</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Apr 2 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>Apr 16 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #3</strong>
+              <small>Apr 30 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 May 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $2,702.12</span>
+        <span class="red-text">Bills $1,241.58</span>
+        <span class="orange-text">Spend $700.00</span>
+        <span class="green-text">Savings $760.54</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>May 14 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+        <article class="pay-card">
+          <button class="pay-toggle pink" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #2</strong>
+              <small>May 28 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$303.54</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+    <section class="month-col">
+      <h2>💗 June 2027 💗</h2>
+      <div class="month-summary">
+        <span class="blue-text">Income $1,351.06</span>
+        <span class="red-text">Bills $544.06</span>
+        <span class="orange-text">Spend $350.00</span>
+        <span class="green-text">Savings $457.00</span>
+      </div>
+      
+        <article class="pay-card">
+          <button class="pay-toggle purple" onclick="toggleCard(this)">
+            <span>
+              <strong>Pay #1</strong>
+              <small>Jun 11 • $1,351.06</small>
+            </span>
+            <b>⌄</b>
+          </button>
+          <div class="pay-details">
+            <button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+            <ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+
+            <button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+            <ul class="section-list orange-list">
+              <li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong></li>
+              <li><span>💖 Spenna Cash</span><strong>$150.00</strong></li>
+            </ul>
+
+            <button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+            <ul class="section-list green-list">
+              <li><span>✨ Planned savings</span><strong>$457.00</strong></li>
+              <li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong></li>
+            </ul>
+          </div>
+        </article>
+        
+    </section>
+    
+</main>
+
+<footer>
+  ✨ ““Savings” means money remaining after known bills, Gas &amp; Groceries, and Spenna Cash. 🦄💖
+</footer>
+
+
+<script>
+function toggleCard(btn) {
+  btn.closest('.pay-card').classList.toggle('open');
+}
+function toggleSection(btn) {
+  const list = btn.nextElementSibling;
+  if (list) list.classList.toggle('open');
+}
+function glitterExplosion(x, y) {
+  const colors = ['#ff1493', '#ff66cc', '#8d38ff', '#28c7ff', '#ffffff', '#ffe66d'];
+  for (let i = 0; i < 30; i++) {
+    const piece = document.createElement('span');
+    piece.className = 'glitter-piece';
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 40 + Math.random() * 80;
+    piece.style.left = x + 'px';
+    piece.style.top = y + 'px';
+    piece.style.color = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.background = piece.style.color;
+    piece.style.setProperty('--x', Math.cos(angle) * distance + 'px');
+    piece.style.setProperty('--y', Math.sin(angle) * distance + 'px');
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 950);
+  }
+}
+document.addEventListener('click', function(e) {
+  const clickable = e.target.closest('button, .pay-toggle, .mini-toggle');
+  if (!clickable) return;
+  glitterExplosion(e.clientX, e.clientY);
+});
+
+const BUDGET_STORAGE_PREFIX = "ashley-budget";
+
+function moneyToNumber(text) {
+  const cleaned = (text || '').replace(/[^0-9.-]/g, '');
+  return cleaned ? parseFloat(cleaned) : 0;
+}
+function moneyFormat(num) {
+  return '$' + (Math.round(num * 100) / 100).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function getCardIncome(card) {
+  const small = card.querySelector('.pay-toggle small');
+  if (!small) return 0;
+  const matches = small.textContent.match(/\$[0-9,]+\.\d{2}/g);
+  if (!matches || !matches.length) return 0;
+  return moneyToNumber(matches[matches.length - 1]);
+}
+function getSectionAmount(card, cls) {
+  const btn = card.querySelector('.mini-toggle.' + cls + ' strong');
+  return moneyToNumber(btn ? btn.textContent : '');
+}
+function storageKey(cardIndex, billIndex) {
+  return BUDGET_STORAGE_PREFIX + '-bill-' + cardIndex + '-' + billIndex;
+}
+function updateMonthTotals(monthCol) {
+  let income = 0, bills = 0, spend = 0, savings = 0;
+
+  monthCol.querySelectorAll('.pay-card').forEach(card => {
+    income += getCardIncome(card);
+    bills += getSectionAmount(card, 'red');
+    spend += getSectionAmount(card, 'orange');
+    savings += getSectionAmount(card, 'green');
+  });
+
+  const summary = monthCol.querySelector('.month-summary');
+  if (!summary) return;
+
+  summary.querySelectorAll('.green-text.income-line').forEach(el => el.remove());
+
+  const incomeLine = summary.querySelector('.blue-text');
+  const billsLine = summary.querySelector('.red-text');
+  const spendLine = summary.querySelector('.orange-text');
+  const savingsLine = summary.querySelector('.green-text:not(.income-line)');
+
+  if (incomeLine) incomeLine.textContent = 'Income ' + moneyFormat(income);
+  if (billsLine) billsLine.textContent = 'Bills ' + moneyFormat(bills);
+  if (spendLine) spendLine.textContent = 'Spend ' + moneyFormat(spend);
+  if (savingsLine) savingsLine.textContent = 'Savings ' + moneyFormat(savings);
+}
+function updateCardTotals(card) {
+  let bills = 0, paid = 0;
+  card.querySelectorAll('.red-list li').forEach(li => {
+    const amt = moneyToNumber(li.querySelector('strong')?.textContent || '0');
+    bills += amt;
+    if (li.classList.contains('paid')) paid += amt;
+  });
+  const spending = getSectionAmount(card, 'orange');
+  const income = getCardIncome(card);
+  const green = income - bills - spending;
+
+  const billBtn = card.querySelector('.mini-toggle.red strong');
+  if (billBtn) billBtn.textContent = moneyFormat(bills);
+
+  const greenBtn = card.querySelector('.mini-toggle.green strong');
+  if (greenBtn) greenBtn.textContent = moneyFormat(green);
+
+  const totalGreen = Array.from(card.querySelectorAll('.green-list li')).find(li => li.textContent.includes('Total green amount') || li.textContent.includes('Planned savings/cushion') || li.textContent.includes('Savings'));
+  if (totalGreen && totalGreen.querySelector('strong')) totalGreen.querySelector('strong').textContent = moneyFormat(green);
+
+  let status = card.querySelector('.bill-status');
+  const redList = card.querySelector('.red-list');
+  if (redList && !status) {
+    status = document.createElement('div');
+    status.className = 'bill-status';
+    redList.insertAdjacentElement('afterend', status);
+  }
+  if (status) {
+    const pct = bills > 0 ? Math.round((paid / bills) * 100) : 0;
+    status.textContent = 'Paid ' + moneyFormat(paid) + ' / Remaining ' + moneyFormat(bills - paid) + ' • ' + pct + '% complete';
+  }
+
+  let progress = card.querySelector('.bill-progress');
+  if (redList && !progress) {
+    progress = document.createElement('div');
+    progress.className = 'bill-progress';
+    progress.innerHTML = '<div class="bill-progress-fill"></div>';
+    status.insertAdjacentElement('afterend', progress);
+  }
+  const fill = card.querySelector('.bill-progress-fill');
+  if (fill) fill.style.width = bills > 0 ? Math.min(100, (paid / bills) * 100) + '%' : '0%';
+
+  const monthCol = card.closest('.month-col');
+  if (monthCol) updateMonthTotals(monthCol);
+}
+function setupBillTracker() {
+  document.querySelectorAll('.pay-card').forEach((card, cardIndex) => {
+    const redList = card.querySelector('.red-list');
+    if (redList && !card.querySelector('.bill-tools')) {
+      const tools = document.createElement('div');
+      tools.className = 'bill-tools';
+      tools.innerHTML = '<button type="button" class="mark-all-paid">Mark all paid</button><button type="button" class="mark-all-unpaid">Clear paid</button><button type="button" class="export-progress">Export</button><button type="button" class="import-progress">Import</button>';
+      redList.insertAdjacentElement('afterend', tools);
+
+      tools.querySelector('.mark-all-paid').addEventListener('click', () => {
+        card.querySelectorAll('.red-list li').forEach((li, billIndex) => {
+          li.classList.add('paid');
+          const btn = li.querySelector('.bill-paid-toggle');
+          if (btn) btn.textContent = '✓';
+          const amount = moneyToNumber(li.querySelector('strong')?.textContent || '0');
+          localStorage.setItem(storageKey(cardIndex, billIndex), JSON.stringify({amount, paid:true}));
+        });
+        updateCardTotals(card);
+      });
+      tools.querySelector('.mark-all-unpaid').addEventListener('click', () => {
+        card.querySelectorAll('.red-list li').forEach((li, billIndex) => {
+          li.classList.remove('paid');
+          const btn = li.querySelector('.bill-paid-toggle');
+          if (btn) btn.textContent = '';
+          const amount = moneyToNumber(li.querySelector('strong')?.textContent || '0');
+          localStorage.setItem(storageKey(cardIndex, billIndex), JSON.stringify({amount, paid:false}));
+        });
+        updateCardTotals(card);
+      });
+      tools.querySelector('.export-progress').addEventListener('click', () => {
+        const data = {};
+        for (let i=0; i<localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith(BUDGET_STORAGE_PREFIX)) data[k] = localStorage.getItem(k);
+        }
+        prompt('Copy this backup text:', JSON.stringify(data));
+      });
+      tools.querySelector('.import-progress').addEventListener('click', () => {
+        const raw = prompt('Paste backup text:');
+        if (!raw) return;
+        try {
+          const data = JSON.parse(raw);
+          Object.keys(data).forEach(k => {
+            if (k.startsWith(BUDGET_STORAGE_PREFIX)) localStorage.setItem(k, data[k]);
+          });
+          location.reload();
+        } catch(e) {
+          alert('Import failed. The backup text was not valid.');
+        }
+      });
+    }
+
+    card.querySelectorAll('.red-list li').forEach((li, billIndex) => {
+      const key = storageKey(cardIndex, billIndex);
+      const strong = li.querySelector('strong');
+      const saved = JSON.parse(localStorage.getItem(key) || '{}');
+
+      if (saved.amount && strong) strong.textContent = moneyFormat(saved.amount);
+      if (saved.paid) li.classList.add('paid');
+
+      if (!li.querySelector('.bill-paid-toggle')) {
+        const btn = document.createElement('button');
+        btn.className = 'bill-paid-toggle';
+        btn.type = 'button';
+        btn.textContent = saved.paid ? '✓' : '';
+        btn.title = 'Mark paid/unpaid';
+        li.insertBefore(btn, li.firstChild);
+
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          li.classList.toggle('paid');
+          btn.textContent = li.classList.contains('paid') ? '✓' : '';
+          const amount = moneyToNumber(strong ? strong.textContent : '0');
+          localStorage.setItem(key, JSON.stringify({amount, paid: li.classList.contains('paid')}));
+          updateCardTotals(card);
+          if (typeof glitterExplosion === 'function') glitterExplosion(e.clientX, e.clientY);
+        });
+      }
+
+      if (strong && !strong.dataset.editReady) {
+        strong.dataset.editReady = '1';
+        strong.title = 'Tap to edit amount';
+        strong.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const current = moneyToNumber(strong.textContent);
+          askNumberPad('Edit bill amount:', current.toFixed(2), function(next) {
+          strong.textContent = moneyFormat(next);
+          localStorage.setItem(key, JSON.stringify({amount: next, paid: li.classList.contains('paid')}));
+          updateCardTotals(card);
+          if (typeof updateCardFromEditableRows === 'function') updateCardFromEditableRows(card);
+          if (typeof updateTommyTopTotals === 'function') updateTommyTopTotals();
+          if (typeof updateAshleyTopTotals === 'function') updateAshleyTopTotals();
+        });
+        });
+      }
+    });
+    updateCardTotals(card);
+  });
+}
+document.addEventListener('DOMContentLoaded', setupBillTracker);
+
+
+
+function updateAshleyTopTotals() {
+  let totalIncome = 0, totalBills = 0, totalSpend = 0, totalSavings = 0;
+
+  document.querySelectorAll('.pay-card').forEach(card => {
+    totalIncome += getCardIncome(card);
+    totalBills += getSectionAmount(card, 'red');
+    totalSpend += getSectionAmount(card, 'orange');
+    totalSavings += getSectionAmount(card, 'green');
+  });
+
+  const kpis = document.querySelectorAll('.kpi');
+  if (kpis[0]) kpis[0].querySelector('strong').textContent = moneyFormat(totalIncome);
+  if (kpis[1]) kpis[1].querySelector('strong').textContent = moneyFormat(totalBills);
+  if (kpis[2]) kpis[2].querySelector('strong').textContent = moneyFormat(totalSpend);
+  if (kpis[3]) {
+    kpis[3].querySelector('span').textContent = '12-Month Savings';
+    kpis[3].querySelector('strong').textContent = moneyFormat(totalSavings);
+  }
+  if (kpis[4]) {
+    kpis[4].querySelector('span').textContent = 'Monthly Avg Savings';
+    kpis[4].querySelector('strong').textContent = moneyFormat(totalSavings / 12);
+  }
+}
+
+function setupAshleyIncomeEditor() {
+  document.querySelectorAll('.pay-card').forEach((card, cardIndex) => {
+    const small = card.querySelector('.pay-toggle small');
+    if (!small || small.dataset.incomeReady === '1') return;
+
+    small.dataset.incomeReady = '1';
+    small.classList.add('pay-income-edit');
+
+    const key = BUDGET_STORAGE_PREFIX + '-income-' + cardIndex;
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      const datePart = small.textContent.split('•')[0].trim();
+      small.textContent = datePart + ' • ' + moneyFormat(parseFloat(saved));
+    }
+
+    small.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const current = getCardIncome(card);
+      const entered = prompt('Edit paycheck amount:', current.toFixed(2));
+      if (entered === null) return;
+
+      const next = parseFloat(entered.replace(/[^0-9.-]/g, ''));
+      if (isNaN(next)) return;
+
+      const datePart = small.textContent.split('•')[0].trim();
+      small.textContent = datePart + ' • ' + moneyFormat(next);
+      localStorage.setItem(key, next.toFixed(2));
+
+      updateCardTotals(card);
+      updateAshleyTopTotals();
+    });
+  });
+
+  document.querySelectorAll('.pay-card').forEach(card => updateCardTotals(card));
+  updateAshleyTopTotals();
+}
+document.addEventListener('DOMContentLoaded', setupAshleyIncomeEditor);
+
+
+function removeDuplicateGreenIncomeLines() {
+  document.querySelectorAll('.month-summary .green-text.income-line').forEach(el => el.remove());
+}
+document.addEventListener('DOMContentLoaded', removeDuplicateGreenIncomeLines);
+
+
+
+function setupEditableMoneyFields() {
+  document.querySelectorAll('.pay-card').forEach((card, cardIndex) => {
+    card.querySelectorAll('.red-list li strong, .orange-list li strong').forEach((strong, fieldIndex) => {
+      if (strong.dataset.moneyEditReady === '1') return;
+      strong.dataset.moneyEditReady = '1';
+      strong.title = 'Tap to edit amount';
+
+      const key = BUDGET_STORAGE_PREFIX + '-money-field-' + cardIndex + '-' + fieldIndex;
+      const saved = localStorage.getItem(key);
+      if (saved !== null) strong.textContent = moneyFormat(parseFloat(saved));
+
+      strong.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const current = moneyToNumber(strong.textContent);
+        askNumberPad('Edit amount:', current > 0 ? current.toFixed(2) : '', function(next) {
+        strong.textContent = moneyFormat(next);
+        localStorage.setItem(key, next.toFixed(2));
+
+        updateCardFromEditableRows(card);
+        if (typeof updateAshleyTopTotals === 'function') updateAshleyTopTotals();
+        if (typeof updateTommyTopTotals === 'function') updateTommyTopTotals();
+      });
+      });
+    });
+
+    updateCardFromEditableRows(card);
+  });
+
+  updateAshleyTopTotals();
+}
+
+function updateCardFromEditableRows(card) {
+  let bills = 0, spending = 0;
+
+  card.querySelectorAll('.red-list li strong').forEach(x => bills += moneyToNumber(x.textContent));
+  card.querySelectorAll('.orange-list li strong').forEach(x => spending += moneyToNumber(x.textContent));
+
+  const income = getCardIncome(card);
+  const savings = income - bills - spending;
+
+  const billBtn = card.querySelector('.mini-toggle.red strong');
+  const spendBtn = card.querySelector('.mini-toggle.orange strong');
+  const greenBtn = card.querySelector('.mini-toggle.green strong');
+
+  if (billBtn) billBtn.textContent = moneyFormat(bills);
+  if (spendBtn) spendBtn.textContent = moneyFormat(spending);
+  if (greenBtn) greenBtn.textContent = moneyFormat(savings);
+
+  card.querySelectorAll('.green-list li strong').forEach(x => {
+    x.textContent = moneyFormat(savings);
+  });
+
+  const monthCol = card.closest('.month-col');
+  if (monthCol) updateMonthTotals(monthCol);
+}
+document.addEventListener('DOMContentLoaded', setupEditableMoneyFields);
+
+
+function setupActualSavingsTracker() {
+  document.querySelectorAll('.pay-card').forEach((card, cardIndex) => {
+    let list = card.querySelector('.green-list');
+    if (!list) return;
+
+    let row = list.querySelector('.actual-savings-row');
+    if (!row) {
+      row = document.createElement('li');
+      row.className = 'actual-savings-row';
+      row.innerHTML = '<span>Enter actual saved</span><strong class="actual-savings-edit">$0.00</strong>';
+      list.insertBefore(row, list.firstChild);
+    }
+
+    const amount = row.querySelector('strong');
+    const key = BUDGET_STORAGE_PREFIX + '-actual-savings-' + cardIndex;
+    const saved = localStorage.getItem(key);
+    if (saved !== null) amount.textContent = moneyFormat(parseFloat(saved));
+
+    if (amount.dataset.actualReady !== '1') {
+      amount.dataset.actualReady = '1';
+      amount.title = 'Tap to edit actual savings';
+      amount.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const current = moneyToNumber(amount.textContent);
+        askNumberPad('Enter actual saved:', current.toFixed(2), function(next) {
+        amount.textContent = moneyFormat(next);
+        localStorage.setItem(key, next.toFixed(2));
+        updateActualSavingsTotal();
+      });
+      });
+    }
+  });
+  updateActualSavingsTotal();
+}
+
+function updateActualSavingsTotal() {
+  let total = 0;
+  document.querySelectorAll('.actual-savings-edit').forEach(el => {
+    total += moneyToNumber(el.textContent);
+  });
+  const top = document.querySelector('.actual-savings-total');
+  if (top) top.textContent = moneyFormat(total);
+}
+
+document.addEventListener('DOMContentLoaded', setupActualSavingsTracker);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function askNumberPad(message, currentValue, callback) {
+  let backdrop = document.querySelector('.number-modal-backdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.className = 'number-modal-backdrop';
+    backdrop.innerHTML =
+      '<div class="number-modal">' +
+      '<label></label>' +
+      '<input inputmode="decimal" type="text" pattern="[0-9]*" autocomplete="off" autocorrect="off" spellcheck="false" />' +
+      '<div class="number-modal-actions"><button type="button" class="number-cancel">Cancel</button><button type="button" class="number-save">Save</button></div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
+  }
+
+  const label = backdrop.querySelector('label');
+  const input = backdrop.querySelector('input');
+  const cancel = backdrop.querySelector('.number-cancel');
+  const save = backdrop.querySelector('.number-save');
+
+  label.textContent = message;
+  input.value = currentValue || '';
+  backdrop.style.display = 'flex';
+
+  setTimeout(() => input.focus(), 50);
+
+  const close = () => {
+    backdrop.style.display = 'none';
+    cancel.onclick = null;
+    save.onclick = null;
+    input.onkeydown = null;
+  };
+
+  cancel.onclick = () => close();
+  save.onclick = () => {
+    const cleaned = input.value.replace(/[^0-9.-]/g, '');
+    const next = parseFloat(cleaned);
+    if (!isNaN(next)) callback(next);
+    close();
+  };
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') save.click();
+    if (e.key === 'Escape') cancel.click();
+  };
+}
+
+
+function removeDuplicateMonthlyAvgSavings() {
+  const cards = Array.from(document.querySelectorAll('.kpi')).filter(kpi => {
+    const label = kpi.querySelector('span');
+    return label && label.textContent.trim() === 'Monthly Avg Savings';
+  });
+  cards.slice(1).forEach(card => card.remove());
+}
+document.addEventListener('DOMContentLoaded', removeDuplicateMonthlyAvgSavings);
+
+
+
+
+
+
+
+
+const FUND_STORAGE_PREFIX = "ashley-fund-line-items-countdown-v2";
+
+function getFundItems(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+  catch(e) { return []; }
+}
+function saveFundItems(key, items) {
+  localStorage.setItem(key, JSON.stringify(items));
+}
+function getFundKey(cardIndex, fundIndex) {
+  return FUND_STORAGE_PREFIX + '-' + cardIndex + '-' + fundIndex;
+}
+function getPayCardIndex(card) {
+  return Array.from(document.querySelectorAll('.pay-card')).indexOf(card);
+}
+function getOriginalSpendingBudget(card) {
+  let total = 0;
+  card.querySelectorAll('.orange-list li').forEach(li => {
+    const budgetStrong = Array.from(li.children).find(el => el.tagName === 'STRONG');
+    total += moneyToNumber(budgetStrong ? budgetStrong.textContent : '0');
+  });
+  return total;
+}
+function getSpentForCard(card) {
+  const cardIndex = getPayCardIndex(card);
+  let spent = 0;
+  card.querySelectorAll('.orange-list li').forEach((li, fundIndex) => {
+    const key = getFundKey(cardIndex, fundIndex);
+    spent += getFundItems(key).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  });
+  return spent;
+}
+function updateSpendingCountdown(card) {
+  const budget = getOriginalSpendingBudget(card);
+  const spent = getSpentForCard(card);
+  const remaining = budget - spent;
+
+  const spendingBtn = card.querySelector('.mini-toggle.orange strong');
+  if (spendingBtn) spendingBtn.textContent = moneyFormat(remaining);
+
+  const monthCol = card.closest('.month-col');
+  if (monthCol) updateMonthSpendingCountdown(monthCol);
+  updateYearSpendingCountdown();
+}
+function updateMonthSpendingCountdown(monthCol) {
+  let remainingTotal = 0;
+  monthCol.querySelectorAll('.pay-card').forEach(card => {
+    remainingTotal += getOriginalSpendingBudget(card) - getSpentForCard(card);
+  });
+
+  const spendLine = monthCol.querySelector('.month-summary .orange-text');
+  if (spendLine) spendLine.textContent = 'Spend left ' + moneyFormat(remainingTotal);
+}
+function updateYearSpendingCountdown() {
+  let remainingTotal = 0;
+  document.querySelectorAll('.pay-card').forEach(card => {
+    remainingTotal += getOriginalSpendingBudget(card) - getSpentForCard(card);
+  });
+
+  document.querySelectorAll('.kpi').forEach(kpi => {
+    const label = kpi.querySelector('span');
+    const value = kpi.querySelector('strong');
+    if (!label || !value) return;
+    if (label.textContent.trim() === '12-Month Spending' || label.textContent.trim() === '12-Month Spending Left') {
+      label.textContent = '12-Month Spending Left';
+      value.textContent = moneyFormat(remainingTotal);
+    }
+  });
+}
+function setupFundTrackers() {
+  document.querySelectorAll('.pay-card').forEach((card, cardIndex) => {
+    card.querySelectorAll('.orange-list li').forEach((li, fundIndex) => {
+      if (li.dataset.fundReady === '1') return;
+      li.dataset.fundReady = '1';
+
+      const budgetStrong = Array.from(li.children).find(el => el.tagName === 'STRONG');
+      if (!budgetStrong) return;
+
+      const key = getFundKey(cardIndex, fundIndex);
+      const tracker = document.createElement('div');
+      tracker.className = 'fund-tracker';
+      tracker.innerHTML =
+        '<div class="fund-summary-line"><span class="fund-used">$0.00 out of $0.00</span><strong class="fund-remaining">$0.00 left</strong></div>' +
+        '<div class="fund-summary-line"><span class="fund-percent">0% used</span></div>' +
+        '<div class="fund-progress"><div class="fund-progress-fill"></div></div>' +
+        '<input class="fund-entry-box" inputmode="decimal" type="text" pattern="[0-9]*" placeholder="Enter amount spent, then press ✓" autocomplete="off" autocorrect="off" spellcheck="false" />' +
+        '<div class="fund-entry-list"></div>';
+      li.appendChild(tracker);
+
+      const input = tracker.querySelector('.fund-entry-box');
+
+      function submitFundAmount() {
+        const amount = parseFloat((input.value || '').replace(/[^0-9.-]/g, ''));
+        if (isNaN(amount) || amount <= 0) return;
+        const items = getFundItems(key);
+        items.push({amount: amount});
+        saveFundItems(key, items);
+        input.value = '';
+        updateFundTracker(li, key);
+        updateSpendingCountdown(card);
+        if (typeof updatePayLeft === 'function') updatePayLeft(card);
+      }
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitFundAmount();
+        }
+      });
+      input.addEventListener('change', function() { submitFundAmount(); });
+      input.addEventListener('blur', function() {
+        if ((input.value || '').trim() !== '') submitFundAmount();
+      });
+
+      updateFundTracker(li, key);
+    });
+    updateSpendingCountdown(card);
+        if (typeof updatePayLeft === 'function') updatePayLeft(card);
+  });
+}
+
+function updateFundTracker(li, key) {
+  const budgetStrong = Array.from(li.children).find(el => el.tagName === 'STRONG');
+  const budget = moneyToNumber(budgetStrong ? budgetStrong.textContent : '0');
+  const items = getFundItems(key);
+  const spent = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  const remaining = budget - spent;
+  const pct = budget > 0 ? Math.min(100, Math.max(0, (spent / budget) * 100)) : 0;
+
+  const usedEl = li.querySelector('.fund-used');
+  const remainingEl = li.querySelector('.fund-remaining');
+  const pctEl = li.querySelector('.fund-percent');
+  const fill = li.querySelector('.fund-progress-fill');
+  const list = li.querySelector('.fund-entry-list');
+
+  if (usedEl) usedEl.textContent = moneyFormat(spent) + ' out of ' + moneyFormat(budget);
+  if (remainingEl) remainingEl.textContent = moneyFormat(remaining) + ' left';
+  if (pctEl) pctEl.textContent = Math.round(pct) + '% used';
+
+  if (fill) {
+    fill.style.width = pct + '%';
+    fill.classList.remove('warn', 'danger');
+    if (pct >= 100) fill.classList.add('danger');
+    else if (pct >= 75) fill.classList.add('warn');
+  }
+
+  if (list) {
+    list.innerHTML = '';
+    items.forEach((item, index) => {
+      const row = document.createElement('div');
+      row.className = 'fund-entry-item';
+      row.innerHTML =
+        '<span>Spent ' + moneyFormat(Number(item.amount || 0)) + '</span>' +
+        '<span><button type="button" class="fund-entry-edit" title="Edit">✏️</button> <button type="button" class="fund-entry-remove" title="Remove">❌</button></span>';
+
+      row.querySelector('.fund-entry-edit').addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (typeof askNumberPad === 'function') {
+          askNumberPad('Edit spent amount:', Number(item.amount || 0) > 0 ? Number(item.amount || 0).toFixed(2) : '', function(next) {
+            items[index].amount = next;
+            saveFundItems(key, items);
+            updateFundTracker(li, key);
+            const card = li.closest('.pay-card');
+            if (card) { updateSpendingCountdown(card); if (typeof updatePayLeft === 'function') updatePayLeft(card); }
+        if (typeof updatePayLeft === 'function') updatePayLeft(card);
+          });
+        } else {
+          const nextRaw = prompt('Edit spent amount:', Number(item.amount || 0).toFixed(2));
+          if (nextRaw === null) return;
+          const next = parseFloat(nextRaw.replace(/[^0-9.-]/g, ''));
+          if (isNaN(next)) return;
+          items[index].amount = next;
+          saveFundItems(key, items);
+          updateFundTracker(li, key);
+          const card = li.closest('.pay-card');
+          if (card) { updateSpendingCountdown(card); if (typeof updatePayLeft === 'function') updatePayLeft(card); }
+        if (typeof updatePayLeft === 'function') updatePayLeft(card);
+        }
+      });
+
+      row.querySelector('.fund-entry-remove').addEventListener('click', function(e) {
+        e.stopPropagation();
+        items.splice(index, 1);
+        saveFundItems(key, items);
+        updateFundTracker(li, key);
+        const card = li.closest('.pay-card');
+        if (card) { updateSpendingCountdown(card); if (typeof updatePayLeft === 'function') updatePayLeft(card); }
+        if (typeof updatePayLeft === 'function') updatePayLeft(card);
+      });
+
+      list.appendChild(row);
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', setupFundTrackers);
+
+
+function updateSavedTotal() {
+  let total = 0;
+  document.querySelectorAll('.actual-savings-edit').forEach(el => {
+    total += moneyToNumber(el.textContent);
+  });
+
+  document.querySelectorAll('.kpi').forEach(kpi => {
+    const label = kpi.querySelector('span');
+    const value = kpi.querySelector('strong');
+    if (!label || !value) return;
+    if (label.textContent.trim() === 'Saved') {
+      value.textContent = moneyFormat(total);
+    }
+  });
+}
+
+function setupActualSavedEditor() {
+  document.querySelectorAll('.green-list li').forEach((li) => {
+    const label = li.querySelector('span');
+    const amount = li.querySelector('strong');
+    if (!label || !amount) return;
+    if (!label.textContent.includes('Enter actual saved')) return;
+
+    amount.classList.add('actual-savings-edit');
+    amount.title = 'Tap to enter actual saved';
+
+    const card = li.closest('.pay-card');
+    const cardIndex = Array.from(document.querySelectorAll('.pay-card')).indexOf(card);
+    const key = 'ashley-actual-saved-v2-' + cardIndex;
+
+    const saved = localStorage.getItem(key);
+    if (saved !== null) amount.textContent = moneyFormat(parseFloat(saved));
+
+    if (amount.dataset.savedReady === '1') return;
+    amount.dataset.savedReady = '1';
+
+    amount.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const current = moneyToNumber(amount.textContent);
+
+      if (typeof askNumberPad === 'function') {
+        askNumberPad('Actual amount saved:', current > 0 ? current.toFixed(2) : '', function(next) {
+          amount.textContent = moneyFormat(next);
+          localStorage.setItem(key, next.toFixed(2));
+          updateSavedTotal();
+        });
+      } else {
+        const entered = prompt('Actual amount saved:', current.toFixed(2));
+        if (entered === null) return;
+        const next = parseFloat(entered.replace(/[^0-9.-]/g, ''));
+        if (isNaN(next)) return;
+        amount.textContent = moneyFormat(next);
+        localStorage.setItem(key, next.toFixed(2));
+        updateSavedTotal();
+      }
+    });
+  });
+
+  updateSavedTotal();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(setupActualSavedEditor, 250);
+});
+
+
+function setupPayLeftDisplay() {
+  document.querySelectorAll('.pay-card').forEach(card => {
+    const small = card.querySelector('.pay-toggle small');
+    if (!small) return;
+
+    small.textContent = small.textContent.replace('Pay', 'Pay');
+
+    if (!small.querySelector('.pay-left-line')) {
+      const left = document.createElement('span');
+      left.className = 'pay-left-line';
+      small.appendChild(document.createElement('br'));
+      small.appendChild(left);
+    }
+
+    updatePayLeft(card);
+  });
+}
+
+function getCardBillsTotal(card) {
+  let total = 0;
+  card.querySelectorAll('.red-list li strong').forEach(x => total += moneyToNumber(x.textContent));
+  return total;
+}
+
+function getCardSpentActual(card) {
+  let spent = 0;
+  card.querySelectorAll('.fund-used').forEach(el => {
+    const txt = el.textContent.split('out of')[0] || '0';
+    spent += moneyToNumber(txt);
+  });
+  return spent;
+}
+
+function getCardSpendingBudget(card) {
+  let total = 0;
+  card.querySelectorAll('.orange-list li').forEach(li => {
+    const budgetStrong = Array.from(li.children).find(el => el.tagName === 'STRONG');
+    total += moneyToNumber(budgetStrong ? budgetStrong.textContent : '0');
+  });
+  return total;
+}
+
+function updatePayLeft(card) {
+  const income = getCardIncome(card);
+  const bills = getCardBillsTotal(card);
+  const spentActual = getCardSpentActual(card);
+  const spendingBudget = getCardSpendingBudget(card);
+
+  const leftNow = income - bills - spentActual;
+  const plannedLeft = income - bills - spendingBudget;
+
+  const leftLine = card.querySelector('.pay-left-line');
+  if (leftLine) {
+    leftLine.innerHTML = '<span>Remaining Spending ' + moneyFormat(leftNow) + '</span><span>Projected Savings ' + moneyFormat(plannedLeft) + '</span>';
+  }
+}
+
+function updateAllPayLeftDisplays() {
+  document.querySelectorAll('.pay-card').forEach(card => updatePayLeft(card));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(setupPayLeftDisplay, 350);
+});
+
+
+document.addEventListener('click', function() {
+  setTimeout(function() {
+    if (typeof updateAllPayLeftDisplays === 'function') updateAllPayLeftDisplays();
+  }, 150);
+});
+document.addEventListener('input', function() {
+  setTimeout(function() {
+    if (typeof updateAllPayLeftDisplays === 'function') updateAllPayLeftDisplays();
+  }, 150);
+});
+
+
+function restylePayLeftLabels() {
+  document.querySelectorAll('.pay-card').forEach(card => {
+    if (typeof updatePayLeft === 'function') updatePayLeft(card);
+  });
+}
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(restylePayLeftLabels, 500);
+});
+
+</script>
+
+</body>
+</html>
+<!-- Updated to icon buttons -->
