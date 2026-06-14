@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ashley's Pay Budget</title>
+<style>
+:root {
+  --bg:#160027; --panel:#3b0b66; --panel2:#fff0fb; --line:#ff8bea;
+  --text:#ffffff; --dark:#281044; --muted:#ffe3fb; --pink:#ff42b3;
+  --hotpink:#ff1493; --purple:#8d38ff; --blue:#28c7ff;
+  --green:#22c55e; --red:#ff2768; --orange:#ffb000; --yellow:#ffe66d;
+}
+* {box-sizing:border-box;}
+body {
+  margin:0; padding:24px; font-family:Arial, Helvetica, sans-serif; color:var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,117,235,.55), transparent 18%),
+    radial-gradient(circle at 85% 8%, rgba(40,199,255,.45), transparent 18%),
+    radial-gradient(circle at 50% 40%, rgba(141,56,255,.5), transparent 35%),
+    linear-gradient(135deg,#12001f,#3b0066 45%,#09001a);
+  overflow-x:hidden;
+}
+body::before {
+  content:"✨ 💖 ✨ 🦄 ✨ 💗 ✨"; position:fixed; top:8px; left:0; right:0;
+  text-align:center; opacity:.55; font-size:22px; pointer-events:none;
+}
+header {max-width:1400px; margin:0 auto 20px; text-align:center;}
+h1 {
+  margin:18px 0 6px; font-size:48px; color:#fff;
+  text-shadow:0 0 8px #ff4bd8,0 0 18px #8d38ff,0 0 28px #28c7ff;
+}
+.ashley-name {
+  font-size:1.35em; font-weight:900; color:#fff;
+  text-shadow:0 0 10px #ff4bd8,0 0 22px #ff1493,0 0 34px #28c7ff;
+}
+.sub {margin:0; color:#fff0fb; font-size:17px; font-weight:700;}
+.kpis {
+  max-width:1400px; margin:18px auto; display:grid;
+  grid-template-columns:repeat(5,minmax(150px,1fr)); gap:12px;
+}
+.kpi {
+  background:linear-gradient(145deg,#ff42b3,#8d38ff); border:2px solid #ffb7f2;
+  border-radius:20px; padding:18px;
+  box-shadow:0 0 18px rgba(255,66,179,.55), inset 0 0 18px rgba(255,255,255,.18);
+}
+.kpi:nth-child(3) {background:linear-gradient(145deg,#28c7ff,#7b2cff);}
+.kpi:nth-child(4) {background:linear-gradient(145deg,#8d38ff,#ff42b3);}
+.kpi span {display:block; color:#fff; font-size:13px; font-weight:900; margin-bottom:8px; text-transform:uppercase;}
+.kpi strong {font-size:25px; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.35);}
+.cancelled {
+  max-width:1400px; margin:0 auto 18px; padding:16px 20px;
+  background:linear-gradient(90deg,#5a1192,#ff42b3,#5a1192);
+  border:2px solid #ffb7f2; border-radius:20px; box-shadow:0 0 18px rgba(255,66,179,.45);
+}
+.cancelled h3 {margin:0 0 10px; font-size:20px;}
+.cancelled ul {margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cancelled li {padding:12px; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);}
+.cancelled li span {display:block; color:#fff; font-weight:800;}
+.cancelled li strong {color:#ffe66d;}
+.month-grid {
+  max-width:1400px; margin:0 auto; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; align-items:start;
+}
+.month-col {
+  background:#fff3fb; color:var(--dark); border:3px solid #ff8bea;
+  border-radius:22px; overflow:hidden; box-shadow:0 0 20px rgba(255,66,179,.55);
+}
+.month-col h2 {
+  margin:0; padding:12px; font-size:27px; text-align:center; color:#fff;
+  background:linear-gradient(90deg,#8d38ff,#ff42b3); text-shadow:0 0 8px rgba(255,255,255,.8);
+}
+.month-summary {display:flex; flex-direction:column; gap:5px; padding:14px; font-size:14px; font-weight:900;}
+.blue-text {color:#0069cc;} .green-text {color:#168a32;} .red-text {color:#e00057;} .orange-text {color:#c67400;}
+.pay-card {margin:10px 12px; border-radius:14px; overflow:hidden; box-shadow:0 4px 12px rgba(120,0,120,.25);}
+.pay-toggle {
+  width:100%; border:0; color:#fff; padding:13px; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center; text-align:left;
+}
+.pay-toggle.purple {background:linear-gradient(90deg,#8d38ff,#bd65ff);}
+.pay-toggle.pink {background:linear-gradient(90deg,#ff1493,#ff66bd);}
+.pay-toggle strong {display:block; font-size:18px;}
+.pay-toggle small {display:block; color:#fff; font-weight:700; margin-top:3px;}
+.pay-toggle b {font-size:22px;}
+.pay-details {display:none; padding:10px; background:#fff;}
+.pay-card.open .pay-details {display:block;}
+.mini-toggle {
+  width:100%; margin:8px 0 0; border:0; color:#fff; padding:11px 12px;
+  border-radius:12px; cursor:pointer; display:flex; justify-content:space-between;
+  font-size:15px; font-weight:900;
+}
+.mini-toggle.red {background:linear-gradient(90deg,#ff2768,#ff6ba3);}
+.mini-toggle.orange {background:linear-gradient(90deg,#ffb000,#ff7ad9);}
+.mini-toggle.green {background:linear-gradient(90deg,#22c55e,#28c7ff);}
+.section-list {display:none; margin:6px 0 8px; padding:0; list-style:none; border-radius:10px; overflow:hidden;}
+.section-list.open {display:block;}
+.section-list li {
+  display:flex; justify-content:space-between; gap:10px; padding:9px; font-size:13px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.section-list li span {color:#351550; font-weight:700;}
+.section-list li strong {white-space:nowrap; font-weight:900;}
+.red-list li {background:#ffe2ee;} .red-list strong {color:#d60054;}
+.orange-list li {background:#fff1d1;} .orange-list strong {color:#ba6900;}
+.green-list li {background:#dcffe9;} .green-list strong {color:#168a32;}
+footer {max-width:1400px; margin:18px auto 0; color:#fff0fb; font-size:13px; text-align:center; font-weight:700;}
+@media (max-width:850px) {
+  body {padding:12px;} h1 {font-size:36px;} .kpis {grid-template-columns:1fr 1fr;}
+  .cancelled ul {grid-template-columns:1fr;}
+  .month-summary span {font-size:21px !important; font-weight:900 !important; line-height:1.45 !important;}
+  .mini-toggle {font-size:20px !important; padding:16px 14px !important;}
+  .mini-toggle strong {font-size:20px !important;}
+  .pay-toggle strong {font-size:24px !important;}
+  .pay-toggle small {font-size:17px !important;}
+  .section-list li {font-size:17px !important; padding:13px 10px !important;}
+}
+
+.glitter-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: glitter-pop 900ms ease-out forwards;
+  box-shadow: 0 0 12px currentColor;
+}
+@keyframes glitter-pop {
+  0% { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(.2) rotate(260deg); }
+}
+
+
+.bill-tools {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:8px 0;
+}
+.bill-tools button {
+  border:1px solid var(--line);
+  background:#050505;
+  color:var(--text);
+  border-radius:10px;
+  padding:8px 10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.bill-progress {
+  height:10px;
+  background:#111;
+  border:1px solid var(--line);
+  border-radius:999px;
+  overflow:hidden;
+  margin:8px 0;
+}
+.bill-progress-fill {
+  height:100%;
+  width:0%;
+  background:var(--green);
+  box-shadow:0 0 12px rgba(0,255,102,.8);
+  transition:width .25s ease;
+}
+.bill-paid-toggle {
+  width:26px;
+  height:26px;
+  min-width:26px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:#050505;
+  color:var(--muted);
+  cursor:pointer;
+  font-weight:900;
+  margin-right:8px;
+}
+.red-list li {
+  align-items:center;
+}
+.red-list li.paid {
+  opacity:.62;
+}
+.red-list li.paid span {
+  text-decoration:line-through;
+}
+.red-list li.paid .bill-paid-toggle {
+  background:var(--green);
+  color:#000;
+  box-shadow:0 0 10px rgba(0,255,102,.7);
+}
+.red-list li strong {
+  cursor:pointer;
+}
+.bill-status {
+  margin:6px 0 8px;
+  padding:8px;
+  border-radius:10px;
+  background:rgba(0,255,102,.08);
+  border:1px solid rgba(0,255,102,.18);
+  color:var(--green);
+  font-size:12px;
+  font-weight:900;
+}
+@media (max-width:850px) {
+  .bill-paid-toggle {
+    width:34px;
+    height:34px;
+    min-width:34px;
+    font-size:18px;
+  }
+  .bill-status, .bill-tools button {
+    font-size:17px !important;
+  }
+}
+
+
+.pay-income-edit {
+  cursor:pointer;
+  color:inherit;
+  border-bottom:1px dashed currentColor;
+}
+.pay-income-edit:hover {
+  text-shadow:0 0 10px currentColor;
+}
+
+
+
+.pay-income-edit {
+  color:#28c7ff !important;
+  font-weight:900 !important;
+  border-bottom:2px dashed #28c7ff !important;
+  text-shadow:0 0 8px #28c7ff, 0 0 18px #28c7ff, 0 0 30px #8d38ff;
+  animation: blueIncomeGlow 1.6s ease-in-out infinite alternate;
+}
+.pay-income-edit::before {
+  content:"✨ ";
+}
+.pay-income-edit::after { content:""; }
+@keyframes blueIncomeGlow {
+  from {
+    filter:brightness(1);
+    text-shadow:0 0 6px #28c7ff, 0 0 14px #28c7ff, 0 0 22px #8d38ff;
+  }
+  to {
+    filter:brightness(1.35);
+    text-shadow:0 0 10px #ffffff, 0 0 24px #28c7ff, 0 0 42px #00e5ff;
+  }
+}
+
+
+.section-list li strong {
+  cursor:pointer;
+  border-bottom:1px dashed currentColor;
+}
+.section-list li strong:hover {
+  filter:brightness(1.25);
+}
+
+
+.actual-savings-edit {
+  cursor:pointer;
+  color:var(--green) !important;
+  font-weight:900 !important;
+  border-bottom:1px dashed currentColor;
+  text-shadow:0 0 10px rgba(0,255,102,.55);
+}
+.actual-savings-row {
+  background:rgba(0,255,102,.12) !important;
+}
+
+
+.fund-tracker {
+  width:100%;
+  margin-top:8px;
+  padding:8px;
+  border-radius:10px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+}
+.fund-tracker-row {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:12px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+.fund-spent-edit {
+  cursor:pointer;
+  border-bottom:1px dashed currentColor;
+}
+.fund-progress {
+  height:10px;
+  background:rgba(0,0,0,.35);
+  border-radius:999px;
+  overflow:hidden;
+}
+.fund-progress-fill {
+  height:100%;
+  width:0%;
+  background:var(--green);
+  box-shadow:0 0 10px currentColor;
+  transition:width .25s ease;
+}
+.fund-progress-fill.warn { background:#ffb84d; }
+.fund-progress-fill.danger { background:var(--red); }
+@media (max-width:850px) {
+  .fund-tracker-row {font-size:16px !important;}
+  .fund-progress {height:14px;}
+}
+
+
+.fund-summary-line {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:13px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+.fund-receipt-log {
+  margin-top:6px;
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.35;
+}
+.fund-add-receipt {
+  margin-top:7px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.35);
+  color:var(--text);
+  border-radius:8px;
+  padding:6px 8px;
+  font-weight:900;
+  cursor:pointer;
+}
+@media (max-width:850px) {
+  .fund-summary-line {font-size:16px !important;}
+  .fund-receipt-log {font-size:14px !important;}
+  .fund-add-receipt {font-size:15px !important;}
+}
+
+
+.fund-entry-box {
+  width:100%;
+  margin-top:8px;
+  padding:9px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(0,0,0,.45);
+  color:var(--text);
+  font-weight:900;
+}
+.fund-entry-box::placeholder {
+  color:var(--muted);
+}
+.fund-percent {
+  font-weight:900;
+}
+
+
+/* Full-width fund tracking layout */
+.orange-list li {
+  display:block !important;
+}
+.orange-list li > span,
+.orange-list li > strong {
+  display:inline-block;
+  vertical-align:top;
+}
+.orange-list li > span {
+  width:calc(100% - 110px);
+}
+.orange-list li > strong {
+  width:105px;
+  text-align:right;
+}
+.fund-tracker {
+  display:block !important;
+  width:100% !important;
+  clear:both !important;
+  margin-top:10px !important;
+  padding:10px !important;
+  border-radius:10px !important;
+  background:rgba(255,255,255,.07) !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+}
+.fund-summary-line {
+  display:flex !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+  margin-bottom:6px !important;
+}
+.fund-progress {
+  height:12px !important;
+  background:rgba(0,0,0,.38) !important;
+  border-radius:999px !important;
+  overflow:hidden !important;
+  margin:8px 0 !important;
+}
+.fund-progress-fill {
+  height:100% !important;
+  width:0%;
+  background:var(--green) !important;
+  box-shadow:0 0 10px currentColor !important;
+  transition:width .25s ease !important;
+}
+.fund-progress-fill.warn { background:#ffb84d !important; }
+.fund-progress-fill.danger { background:var(--red) !important; }
+.fund-entry-box {
+  display:block !important;
+  width:100% !important;
+  margin-top:8px !important;
+  padding:10px !important;
+  border-radius:9px !important;
+  border:1px solid rgba(255,255,255,.25) !important;
+  background:rgba(0,0,0,.45) !important;
+  color:var(--text) !important;
+  font-weight:900 !important;
+  font-size:16px !important;
+}
+@media (max-width:850px) {
+  .orange-list li > span,
+  .orange-list li > strong {
+    font-size:17px !important;
+  }
+  .fund-summary-line {
+    font-size:17px !important;
+    line-height:1.35 !important;
+  }
+  .fund-progress {
+    height:15px !important;
+  }
+  .fund-entry-box {
+    font-size:17px !important;
+    padding:12px !important;
+  }
+}
+
+
+.number-modal-backdrop {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:99999;
+}
+.number-modal {
+  width:min(92vw,380px);
+  padding:18px;
+  border-radius:16px;
+  background:var(--panel2);
+  border:1px solid var(--line);
+  box-shadow:0 0 25px rgba(0,255,102,.25);
+}
+.number-modal label {
+  display:block;
+  font-weight:900;
+  margin-bottom:10px;
+  color:var(--text);
+}
+.number-modal input {
+  width:100%;
+  padding:14px;
+  font-size:22px;
+  font-weight:900;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#000;
+  color:var(--text);
+}
+.number-modal-actions {
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.number-modal-actions button {
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  font-weight:900;
+  cursor:pointer;
+}
+
+
+.fund-entry-display {
+  margin-top:8px;
+  padding:8px;
+  border-radius:9px;
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.16);
+  font-weight:900;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+}
+.fund-entry-actions {
+  display:flex;
+  gap:6px;
+}
+.fund-entry-actions button {
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:8px;
+  padding:5px 8px;
+  font-weight:900;
+  cursor:pointer;
+}
+.fund-edit-btn { background:rgba(255,184,77,.35); color:var(--text); }
+.fund-remove-btn { background:rgba(255,39,104,.35); color:var(--text); }
+@media (max-width:850px) {
+  .fund-entry-display {font-size:16px !important;}
+  .fund-entry-actions button {font-size:14px !important; padding:7px 9px !important;}
+}
+
+
+.fund-entry-box {
+  margin-bottom:8px !important;
+}
+.fund-entry-list {
+  margin-top:8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.fund-entry-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border-radius:8px;
+  background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,255,255,.14);
+  font-weight:900;
+}
+.fund-entry-item button {
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:7px;
+  padding:4px 7px;
+  font-weight:900;
+  cursor:pointer;
+}
+.fund-entry-edit { background:rgba(255,184,77,.35); color:var(--text); }
+.fund-entry-remove { background:rgba(255,39,104,.35); color:var(--text); }
+@media (max-width:850px) {
+  .fund-entry-item {font-size:15px !important;}
+  .fund-entry-item button {font-size:13px !important;}
+}
+
+
+.pay-left-line {
+  display:block;
+  margin-top:4px;
+  color:var(--green) !important;
+  font-weight:900 !important;
+}
+
+
+.pay-left-line {
+  display:block !important;
+  margin-top:6px !important;
+  font-size:.72em !important;
+  line-height:1.25 !important;
+  color:var(--green) !important;
+  font-weight:900 !important;
+}
+.pay-left-line span {
+  display:block !important;
+}
+@media (max-width:850px) {
+  .pay-left-line {
+    font-size:15px !important;
+    line-height:1.3 !important;
+  }
+}
+
+
+.pay-left-line {
+  display:block !important;
+  margin-top:7px !important;
+  font-size:.72em !important;
+  line-height:1.28 !important;
+  font-weight:900 !important;
+}
+.pay-left-line span {
+  display:block !important;
+  color:#ff42b3 !important;
+  text-shadow:none !important;
+}
+.pay-left-line .pay-left-money {
+  color:#28c7ff !important;
+  text-shadow:0 0 8px #28c7ff, 0 0 18px #8d38ff !important;
+  animation: payMoneyPulse 1.5s ease-in-out infinite alternate;
+}
+@keyframes payMoneyPulse {
+  from { filter:brightness(1); }
+  to { filter:brightness(1.35); }
+}
+@media (max-width:850px) {
+  .pay-left-line {
+    font-size:15px !important;
+  }
+}
+
+</style>
+<style id="ashley-merged-final-css">
+/* Ashley merged final: Tommy compact layout + Ashley purple/pink colors */
+:root{
+  --pink:#ff5fc8;--pink2:#ff8bea;--purple:#8d38ff;--purple2:#2a063f;
+  --green:#34ff7a;--red:#ff4f8e;--orange:#ffad33;--cyan:#5dfcff;
+  --text:#fff6ff;--muted:#e7c9f0;--panel:#13051d;--line:#65306e;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0!important;
+  background:radial-gradient(circle at 50% 0%,rgba(255,95,200,.18),transparent 35%),#08000d!important;
+  color:var(--text)!important;
+  font-family:Arial,Helvetica,sans-serif!important;
+}
+body{padding:6px!important}
+body::before, header,.cancelled{display:none!important}
+
+.kpis{max-width:720px!important;margin:0 auto 8px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important}
+.kpi{
+  min-height:56px!important;
+  background:linear-gradient(180deg,rgba(32,6,45,.98),rgba(12,2,18,.98))!important;
+  border:1px solid rgba(255,95,200,.35)!important;
+  border-radius:11px!important;
+  padding:8px!important;
+  box-shadow:inset 0 0 12px rgba(255,95,200,.08),0 0 10px rgba(255,95,200,.12)!important;
+}
+.kpi span{display:block!important;color:#dec7e8!important;font-size:10px!important;line-height:1.1!important;text-transform:none!important;margin:0!important}
+.kpi strong{display:block!important;margin-top:7px!important;font-size:15px!important;line-height:1!important;color:#fff!important;text-shadow:0 0 8px rgba(255,139,234,.65)!important}
+.green-text{color:var(--green)!important;text-shadow:0 0 8px rgba(52,255,122,.75)!important}
+.red-text{color:var(--red)!important;text-shadow:0 0 8px rgba(255,79,142,.75)!important}
+.orange-text{color:var(--orange)!important;text-shadow:0 0 8px rgba(255,173,51,.75)!important}
+
+.month-grid{max-width:720px!important;margin:0 auto!important;display:block!important}
+.month-col{
+  margin:6px auto!important;padding:0!important;overflow:hidden!important;
+  border:1.5px solid var(--pink)!important;border-radius:13px!important;
+  background:linear-gradient(180deg,#1a0628,#09000f)!important;
+  box-shadow:0 0 12px rgba(255,95,200,.55),inset 0 0 14px rgba(255,95,200,.08)!important;
+  color:var(--text)!important;
+}
+.month-col h2{
+  margin:0!important;padding:9px 10px 0!important;display:flex!important;
+  align-items:flex-start!important;justify-content:space-between!important;border:0!important;
+  line-height:1!important;cursor:pointer!important;background:transparent!important;text-shadow:none!important;text-align:left!important;
+}
+.month-title-text{font-size:21px!important;font-weight:900!important;letter-spacing:.2px!important;color:var(--text)!important}
+.month-toggle{
+  width:30px!important;height:30px!important;min-width:30px!important;border-radius:50%!important;
+  border:2px solid var(--pink)!important;background:rgba(0,0,0,.42)!important;color:var(--pink2)!important;
+  font-size:22px!important;font-weight:900!important;line-height:22px!important;padding:0!important;
+  box-shadow:0 0 12px rgba(255,95,200,.85),inset 0 0 8px rgba(255,95,200,.25)!important;
+}
+.month-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;padding:7px 4px 8px!important;align-items:start!important;margin:0!important}
+.metric{position:relative!important;display:block!important;min-height:64px!important;padding:27px 1px 0!important;text-align:center!important;background:transparent!important;border:0!important;line-height:1!important;overflow:visible!important}
+.metric:not(:last-child)::after{content:""!important;display:block!important;position:absolute!important;right:0!important;top:2px!important;height:58px!important;width:1px!important;background:rgba(255,205,250,.34)!important}
+.safe-icon{position:absolute!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;font-size:21px!important;line-height:1!important;font-weight:900!important;filter:drop-shadow(0 0 5px currentColor) drop-shadow(0 0 9px currentColor)!important}
+.metric-income .safe-icon{color:var(--pink)!important}
+.metric-bills .safe-icon{color:var(--red)!important}
+.metric-spending .safe-icon{color:var(--orange)!important}
+.metric-savings .safe-icon{color:var(--cyan)!important}
+.metric-label{display:block!important;color:#fff6ff!important;font-size:8.5px!important;font-weight:900!important;line-height:1!important;white-space:nowrap!important;margin:0 0 4px!important;text-shadow:none!important}
+.metric-value{display:block!important;font-size:9.5px!important;font-weight:900!important;line-height:1!important;white-space:nowrap!important;letter-spacing:-.35px!important;margin:0!important}
+.metric-income .metric-value{color:var(--pink2)!important;text-shadow:0 0 7px rgba(255,139,234,.8),0 0 12px rgba(255,139,234,.45)!important}
+.metric-bills .metric-value{color:var(--red)!important;text-shadow:0 0 7px rgba(255,79,142,.8),0 0 12px rgba(255,79,142,.42)!important}
+.metric-spending .metric-value{color:var(--orange)!important;text-shadow:0 0 7px rgba(255,173,51,.8),0 0 12px rgba(255,173,51,.45)!important}
+.metric-savings .metric-value{color:var(--cyan)!important;text-shadow:0 0 7px rgba(93,252,255,.8),0 0 12px rgba(93,252,255,.45)!important}
+
+.month-col.collapsed .pay-card{display:none!important}
+.month-col:not(.collapsed){padding-bottom:8px!important}
+.month-col:not(.collapsed) .pay-card{
+  margin:8px 10px!important;border:1px solid rgba(255,95,200,.32)!important;border-radius:12px!important;
+  background:rgba(32,6,45,.72)!important;box-shadow:inset 0 0 12px rgba(255,95,200,.08)!important;overflow:hidden!important;
+}
+.pay-card.open{transform:none!important}
+.pay-toggle{width:100%!important;background:transparent!important;color:var(--text)!important;border:0!important;padding:10px 12px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;text-align:left!important}
+.pay-toggle strong{font-size:17px!important;color:#fff!important}
+.pay-toggle small{font-size:12px!important;color:var(--pink2)!important;display:block!important}
+.pay-toggle b,.pay-arrow{color:var(--pink2)!important;font-size:22px!important;font-weight:400!important}
+.pay-details{display:none!important;padding:10px!important;border-top:1px solid rgba(255,95,200,.24)!important;background:transparent!important}
+.pay-card.open .pay-details{display:block!important}
+.pay-income-edit{cursor:pointer!important;color:var(--cyan)!important;font-weight:900!important;border-bottom:1px dashed var(--cyan)!important;text-shadow:0 0 8px var(--cyan),0 0 18px var(--purple)!important}
+
+.mini-toggle{width:100%!important;margin:6px 0 0!important;border:1px solid var(--line)!important;color:var(--text)!important;padding:10px!important;border-radius:10px!important;cursor:pointer!important;display:flex!important;justify-content:space-between!important;background:#14091a!important;font-weight:900!important;font-size:13px!important}
+.mini-toggle.red{border-left:5px solid var(--red)!important;background:#160912!important}
+.mini-toggle.orange{border-left:5px solid var(--orange)!important;background:#1c1206!important}
+.mini-toggle.green{border-left:5px solid var(--cyan)!important;background:#061719!important}
+.section-list{display:none!important;margin:6px 0 8px!important;padding:0!important;list-style:none!important;border-radius:10px!important;overflow:hidden!important}
+.section-list.open{display:block!important}
+.section-list li{gap:10px!important;padding:9px!important;font-size:13px!important;border-bottom:1px solid rgba(255,255,255,.06)!important}
+.red-list li{background:rgba(255,79,142,.10)!important;cursor:pointer!important;display:flex!important;justify-content:space-between!important}
+.orange-list li,.green-list li{display:block!important;background:rgba(255,95,200,.09)!important;cursor:pointer!important}
+.red-list li span,.orange-list li span,.green-list li span{color:#fff6ff!important;font-weight:800!important}
+.red-list li.paid span,.red-list li.paid strong{text-decoration:line-through!important;opacity:.58!important}
+.orange-list li.paid span,.orange-list li.paid strong,.green-list li.paid span,.green-list li.paid strong{text-decoration:none!important;opacity:1!important}
+.red-list strong{color:var(--red)!important;cursor:pointer!important}
+.orange-list strong{color:var(--orange)!important}
+.green-list strong{color:var(--cyan)!important}
+
+.orange-list li .line-main,.green-list li .line-main{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:10px!important}
+.orange-list li .line-main span,.green-list li .line-main span{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.remaining-small{display:none!important}
+.cat-entry{margin-top:9px!important;padding:9px!important;border:1px solid rgba(255,139,234,.35)!important;border-radius:12px!important;background:rgba(59,11,102,.30)!important}
+.cat-input{width:calc(100% - 46px)!important;padding:11px!important;border:1px solid rgba(255,139,234,.55)!important;border-radius:10px!important;background:rgba(0,0,0,.38)!important;color:#fff!important;font-size:16px!important;font-weight:900!important}
+.cat-input::placeholder{color:#ffb7f2!important}
+.cat-add{width:38px!important;margin-left:6px!important;padding:11px 0!important;border:1px solid #ff5fc8!important;border-radius:10px!important;background:rgba(59,11,102,.65)!important;color:#ff8bea!important;font-weight:900!important;font-size:18px!important}
+.cat-log{margin-top:7px!important}
+.cat-line{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:10px!important;width:100%!important;margin-top:6px!important;padding:8px 9px!important;border-radius:9px!important;background:rgba(0,0,0,.26)!important;border:1px solid rgba(255,139,234,.22)!important;color:#fff!important;font-size:13px!important;font-weight:900!important}
+.cat-line span::before{content:"Spent "}
+.cat-line button{margin-left:auto!important;border:0!important;background:transparent!important;color:#ff5fc8!important;font-size:17px!important;font-weight:900!important}
+</style><style id="ashley-merged-bugfix-css">
+.pay-income-edit{cursor:pointer!important;color:var(--cyan)!important;font-weight:900!important;border-bottom:1px dashed var(--cyan)!important;text-shadow:0 0 8px var(--cyan),0 0 18px var(--purple)!important}
+.pay-left-line{display:block!important;margin-top:5px!important;color:var(--pink2)!important;font-size:12px!important;font-weight:900!important}
+.pay-left-line .left-money,.pay-left-line .save-money{color:var(--cyan)!important;text-shadow:0 0 8px var(--cyan)!important}
+.orange-list li.paid span,.orange-list li.paid strong,.green-list li.paid span,.green-list li.paid strong{text-decoration:none!important;opacity:1!important}
+.red-list li.paid span,.red-list li.paid strong{text-decoration:line-through!important;opacity:.58!important}
+.line-main{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:10px!important}
+.remaining-small{display:none!important}
+.cat-entry{margin-top:9px!important;padding:9px!important;border:1px solid rgba(255,139,234,.35)!important;border-radius:12px!important;background:rgba(59,11,102,.30)!important}
+.cat-input{width:calc(100% - 46px)!important;padding:11px!important;border:1px solid rgba(255,139,234,.55)!important;border-radius:10px!important;background:rgba(0,0,0,.38)!important;color:#fff!important;font-size:16px!important;font-weight:900!important}
+.cat-add{width:38px!important;margin-left:6px!important;padding:11px 0!important;border:1px solid #ff5fc8!important;border-radius:10px!important;background:rgba(59,11,102,.65)!important;color:#ff8bea!important;font-weight:900!important;font-size:18px!important}
+.cat-line{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:10px!important;width:100%!important;margin-top:6px!important;padding:8px 9px!important;border-radius:9px!important;background:rgba(0,0,0,.26)!important;border:1px solid rgba(255,139,234,.22)!important;color:#fff!important;font-size:13px!important;font-weight:900!important}
+.cat-line span::before{content:"Spent "}
+.cat-line button{margin-left:auto!important;border:0!important;background:transparent!important;color:#ff5fc8!important;font-size:17px!important;font-weight:900!important}
+</style><style id="pay-left-slash-final-css">
+.pay-cash-left {
+  color:#5dfcff!important;
+  font-weight:900!important;
+  text-shadow:0 0 8px #5dfcff,0 0 18px #8d38ff!important;
+  white-space:nowrap!important;
+}
+.pay-income-edit {
+  white-space:nowrap!important;
+}
+</style><style id="ashley-number-pad-only-css">
+.paycheck-modal-backdrop{
+  position:fixed!important;
+  inset:0!important;
+  background:rgba(0,0,0,.72)!important;
+  display:none;
+  align-items:center!important;
+  justify-content:center!important;
+  z-index:999999!important;
+}
+.paycheck-modal{
+  width:min(92vw,360px)!important;
+  padding:18px!important;
+  border-radius:16px!important;
+  background:linear-gradient(180deg,#1a0628,#09000f)!important;
+  border:2px solid #ff5fc8!important;
+  box-shadow:0 0 24px rgba(255,95,200,.75)!important;
+}
+.paycheck-modal label{
+  display:block!important;
+  color:#fff6ff!important;
+  font-size:16px!important;
+  font-weight:900!important;
+  margin-bottom:10px!important;
+}
+.paycheck-modal input{
+  width:100%!important;
+  padding:14px!important;
+  border-radius:12px!important;
+  border:1px solid #ff8bea!important;
+  background:#050008!important;
+  color:#fff!important;
+  font-size:24px!important;
+  font-weight:900!important;
+}
+.paycheck-modal-actions{
+  display:flex!important;
+  gap:10px!important;
+  margin-top:12px!important;
+}
+.paycheck-modal-actions button{
+  flex:1!important;
+  padding:12px!important;
+  border-radius:12px!important;
+  border:1px solid #ff8bea!important;
+  font-weight:900!important;
+  font-size:16px!important;
+}
+.paycheck-save{background:#ff5fc8!important;color:#160027!important}
+.paycheck-cancel{background:#12001f!important;color:#fff!important}
+</style><style id="money-pad-universal-css">
+.money-pad-backdrop{
+  position:fixed!important;inset:0!important;background:rgba(0,0,0,.72)!important;
+  display:none;align-items:center!important;justify-content:center!important;z-index:9999999!important;
+}
+.money-pad-box{
+  width:min(92vw,360px)!important;padding:18px!important;border-radius:16px!important;
+  background:linear-gradient(180deg,#061423,#02070d)!important;border:2px solid #159dff!important;
+  box-shadow:0 0 24px rgba(21,157,255,.75)!important;
+}
+.money-pad-box label{display:block!important;color:#fff!important;font-size:16px!important;font-weight:900!important;margin-bottom:10px!important;}
+.money-pad-box input{
+  width:100%!important;padding:14px!important;border-radius:12px!important;border:1px solid #159dff!important;
+  background:#050505!important;color:#fff!important;font-size:24px!important;font-weight:900!important;
+}
+.money-pad-actions{display:flex!important;gap:10px!important;margin-top:12px!important;}
+.money-pad-actions button{
+  flex:1!important;padding:12px!important;border-radius:12px!important;border:1px solid #159dff!important;
+  font-weight:900!important;font-size:16px!important;
+}
+.money-pad-save{background:#159dff!important;color:#00111f!important}
+.money-pad-cancel{background:#050505!important;color:#fff!important}
+
+.money-pad-box{background:linear-gradient(180deg,#1a0628,#09000f)!important;border-color:#ff5fc8!important;box-shadow:0 0 24px rgba(255,95,200,.75)!important;}
+.money-pad-box input{border-color:#ff8bea!important;background:#050008!important}
+.money-pad-actions button{border-color:#ff8bea!important}
+.money-pad-save{background:#ff5fc8!important;color:#160027!important}
+.pay-cash-left{color:#ff4f8e!important;text-shadow:0 0 8px rgba(255,79,142,.9),0 0 18px rgba(255,79,142,.55)!important;}
+</style><style id="ashley-date-aware-archive-css">
+.pay-days-left{display:inline-block!important;margin-left:6px!important;color:#ff8bea!important;font-weight:900!important;text-shadow:0 0 8px #ff8bea,0 0 14px #ff8bea!important;white-space:nowrap!important}
+.pay-card.active-paycheck{border-color:#ff8bea!important;box-shadow:0 0 18px #ff8bea,inset 0 0 14px rgba(255,255,255,.08)!important}
+.pay-archive-dock{max-width:720px!important;margin:0 auto 8px!important}
+.archive-toggle{width:100%!important;border:1px solid rgba(255,95,200,.48)!important;border-radius:12px!important;background:linear-gradient(180deg,rgba(32,6,45,.98),rgba(12,2,18,.98))!important;color:#fff!important;padding:10px 12px!important;font-weight:900!important;font-size:14px!important;display:flex!important;justify-content:space-between!important;align-items:center!important;box-shadow:0 0 14px rgba(255,95,200,.48),inset 0 0 12px rgba(255,255,255,.06)!important}
+.archive-toggle span{color:#ff8bea!important;text-shadow:0 0 8px #ff8bea!important}
+.archive-panel{display:none;margin-top:7px!important;border:1px solid rgba(255,95,200,.48)!important;border-radius:12px!important;background:rgba(32,6,45,.78)!important;padding:8px!important}
+.pay-archive-dock.open .archive-panel{display:block!important}
+.archive-panel .pay-card{display:block!important;margin:8px 0!important;border:1px solid rgba(255,95,200,.48)!important;border-radius:12px!important;background:rgba(32,6,45,.72)!important;box-shadow:inset 0 0 12px rgba(255,255,255,.06)!important;overflow:hidden!important}
+.archive-panel .pay-card.open .pay-details{display:block!important}
+.archive-panel .pay-card .pay-details{display:none}
+.archive-empty{border:1px solid rgba(255,95,200,.48)!important;border-radius:10px!important;padding:8px 10px!important;margin:6px 0!important;background:rgba(0,0,0,.28)!important;color:#cfd8e3!important;font-size:12px!important}
+.month-col.archived-month{display:none!important}
+</style></head>
+<body>
+<header>
+<h1>🦄 <span class="ashley-name">Ashley</span>'s Pay Budget ✨</h1>
+<p class="sub">Clickable 12-month budget view. Includes Gas &amp; Groceries and Spenna Cash. 💖✨</p>
+</header>
+<section class="kpis">
+<div class="kpi"><span>Saved</span><strong class="green-text actual-savings-total">$0.00</strong></div>
+<div class="kpi"><span>12-Month Pays</span><strong>$36,478.62</strong></div>
+<div class="kpi"><span>12-Month Bills</span><strong>$16,684.60</strong></div>
+<div class="kpi"><span>12-Month Spending</span><strong>$9,450.00</strong></div>
+<div class="kpi"><span>12-Month Savings</span><strong>$10,344.02</strong></div>
+<div class="kpi"><span>Monthly Avg Savings</span><strong>$862.00</strong></div>
+</section>
+<section class="pay-archive-dock" id="payArchiveDock">
+<button class="archive-toggle" id="archiveToggle" type="button">📅 Archived checks <span id="archiveCount">0</span></button>
+<div class="archive-panel" id="archivePanel"></div>
+</section>
+
+
+<main class="month-grid">
+<section class="month-col collapsed">
+<h2><span class="month-title-text">June 2026</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Jun 12 • <span class="pay-income-edit" data-pay-index="0">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Jun 26 • <span class="pay-income-edit" data-pay-index="1">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">July 2026</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Jul 10 • <span class="pay-income-edit" data-pay-index="2">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Jul 24 • <span class="pay-income-edit" data-pay-index="3">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">August 2026</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Aug 7 • <span class="pay-income-edit" data-pay-index="4">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Aug 21 • <span class="pay-income-edit" data-pay-index="5">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">September 2026</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Sep 4 • <span class="pay-income-edit" data-pay-index="6">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Sep 18 • <span class="pay-income-edit" data-pay-index="7">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">October 2026</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$4,053.18</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,785.64</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$1,050.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$1,217.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Oct 2 • <span class="pay-income-edit" data-pay-index="8">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Oct 16 • <span class="pay-income-edit" data-pay-index="9">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay #3</strong>
+<small>Oct 30 • <span class="pay-income-edit" data-pay-index="10">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">November 2026</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Nov 13 • <span class="pay-income-edit" data-pay-index="11">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Nov 27 • <span class="pay-income-edit" data-pay-index="12">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">December 2026</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Dec 11 • <span class="pay-income-edit" data-pay-index="13">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Dec 25 • <span class="pay-income-edit" data-pay-index="14">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">January 2027</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Jan 8 • <span class="pay-income-edit" data-pay-index="15">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Jan 22 • <span class="pay-income-edit" data-pay-index="16">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">February 2027</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Feb 5 • <span class="pay-income-edit" data-pay-index="17">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Feb 19 • <span class="pay-income-edit" data-pay-index="18">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">March 2027</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Mar 5 • <span class="pay-income-edit" data-pay-index="19">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Mar 19 • <span class="pay-income-edit" data-pay-index="20">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">April 2027</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$4,053.18</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,939.10</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$1,050.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$1,064.08</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Apr 2 • <span class="pay-income-edit" data-pay-index="21">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Apr 16 • <span class="pay-income-edit" data-pay-index="22">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay #3</strong>
+<small>Apr 30 • <span class="pay-income-edit" data-pay-index="23">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">May 2027</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$2,702.12</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$1,241.58</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$700.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$760.54</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>May 14 • <span class="pay-income-edit" data-pay-index="24">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+<article class="pay-card">
+<button class="pay-toggle pink" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>May 28 • <span class="pay-income-edit" data-pay-index="25">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$697.52</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Progressive</span><strong>$101.00</strong></li><li><span>💖 StorageMart</span><strong>$161.76</strong></li><li><span>💖 Google One</span><strong>$3.19</strong></li><li><span>💖 Peacock</span><strong>$11.59</strong></li><li><span>💖 Hulu/Roku</span><strong>$32.61</strong></li><li><span>💖 Amazon Prime</span><strong>$7.37</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$303.54</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$303.54</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+<section class="month-col collapsed">
+<h2><span class="month-title-text">June 2027</span><button class="month-toggle" type="button">+</button></h2>
+<div class="month-summary"><div class="metric metric-income"><span class="safe-icon">♡</span><div class="metric-label">Income</div><div class="metric-value">$1,351.06</div></div><div class="metric metric-bills"><span class="safe-icon">▤</span><div class="metric-label">Bills</div><div class="metric-value">$544.06</div></div><div class="metric metric-spending"><span class="safe-icon">🛒</span><div class="metric-label">Spending</div><div class="metric-value">$350.00</div></div><div class="metric metric-savings"><span class="safe-icon">♧</span><div class="metric-label">Savings</div><div class="metric-value">$457.00</div></div></div>
+<article class="pay-card">
+<button class="pay-toggle purple" onclick="toggleCard(this)">
+<span>
+<strong>Pay</strong>
+<small>Jun 11 • <span class="pay-income-edit" data-pay-index="26">$1,351.06</span></small>
+</span>
+<b class="pay-arrow">›</b>
+</button>
+<div class="pay-details">
+<button class="mini-toggle red" onclick="toggleSection(this)">Bills <strong>$544.06</strong></button>
+<ul class="section-list red-list"><li><span>💖 Revco</span><strong>$150.00</strong></li><li><span>💖 AT&amp;T</span><strong>$100.00</strong></li><li><span>💖 GM Financial</span><strong>$130.00</strong></li><li><span>💖 Rent</span><strong>$150.00</strong></li><li><span>💖 Spotify</span><strong>$14.06</strong></li></ul>
+<button class="mini-toggle orange" onclick="toggleSection(this)">Spending <strong>$350.00</strong></button>
+<ul class="section-list orange-list">
+<li><span>⛽ Gas &amp; Groceries</span><strong>$200.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>💖 Spenna Cash</span><strong>$150.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+<button class="mini-toggle green" onclick="toggleSection(this)">Savings <strong>$457.00</strong></button>
+<ul class="section-list green-list">
+<li><span>✨ Planned savings</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+<li><span>🦄 Planned savings/cushion</span><strong>$457.00</strong><div class="cat-entry" style="display:none"><input autocomplete="off" class="cat-input" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" type="number"/><button class="cat-add" type="button">+</button><div class="cat-log"></div></div></li>
+</ul>
+</div>
+</article>
+</section>
+</main>
+<footer>
+  ✨ ““Savings” means money remaining after known bills, Gas &amp; Groceries, and Spenna Cash. 🦄💖
+</footer>
+<script id="ashley-final-single-script">
+function moneyNum(text){
+  const n = parseFloat(String(text || '').replace(/[^0-9.-]/g,''));
+  return isNaN(n) ? 0 : n;
+}
+function fmtMoney(n){
+  return '$' + Number(n || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function toggleCard(btn){
+  const card = btn.closest('.pay-card');
+  if(!card) return;
+  card.classList.toggle('open');
+  const arrow = btn.querySelector('b');
+  if(arrow) arrow.textContent = card.classList.contains('open') ? '⌃' : '›';
+}
+function toggleSection(btn){
+  const list = btn.nextElementSibling;
+  if(list) list.classList.toggle('open');
+}
+(function(){
+  const PAY_KEY='ashleyFinalPayAmountsV2';
+  const CAT_KEY='ashleyFinalCategoryEntriesV2';
+  const BILL_KEY='ashleyFinalBillPaidV2';
+
+  function getSectionTotal(card, selector){
+    let total = 0;
+    card.querySelectorAll(selector).forEach(list=>{
+      const btn = list.previousElementSibling;
+      const strong = btn && btn.querySelector('strong');
+      if(strong) total += moneyNum(strong.textContent);
+    });
+    return total;
+  }
+
+  function recalcCategory(li){
+    const strong = li.querySelector('.line-main strong');
+    if(!strong) return;
+    const original = parseFloat(strong.dataset.originalAmount || moneyNum(strong.textContent));
+    let spent = 0;
+    li.querySelectorAll('.cat-line span').forEach(s=> spent += moneyNum(s.textContent));
+    strong.textContent = fmtMoney(Math.max(0, original - spent));
+    li.classList.remove('paid');
+  }
+
+  function recalcSection(list){
+    const btn = list.previousElementSibling;
+    if(!btn || !btn.classList.contains('mini-toggle')) return;
+    let total = 0;
+    list.querySelectorAll(':scope > li').forEach(li=>{
+      if(list.classList.contains('orange-list') || list.classList.contains('green-list')){
+        recalcCategory(li);
+        const strong = li.querySelector('.line-main strong');
+        if(strong) total += moneyNum(strong.textContent);
+      } else {
+        const strong = li.querySelector('strong');
+        if(strong && !li.classList.contains('paid')) total += moneyNum(strong.textContent);
+      }
+    });
+    const totalStrong = btn.querySelector('strong');
+    if(totalStrong) totalStrong.textContent = fmtMoney(total);
+  }
+
+  function updatePayCard(card){
+    card.querySelectorAll('.section-list').forEach(recalcSection);
+    const pay = moneyNum(card.querySelector('.pay-income-edit')?.textContent);
+    const bills = getSectionTotal(card,'.red-list');
+    const spending = getSectionTotal(card,'.orange-list');
+    const savings = Math.max(0, pay - bills - spending);
+    let line = card.querySelector('.pay-left-line');
+    if(!line){
+      line = document.createElement('span');
+      line.className = 'pay-left-line';
+      card.querySelector('.pay-toggle span').appendChild(line);
+    }
+    line.innerHTML = 'Remaining Spending <span class="left-money">'+fmtMoney(spending)+'</span><br>Projected Savings <span class="save-money">'+fmtMoney(savings)+'</span>';
+  }
+
+  function updateMonthSummary(month){
+    let income=0,bills=0,spending=0,savings=0;
+    month.querySelectorAll('.pay-card').forEach(card=>{
+      updatePayCard(card);
+      const pay = moneyNum(card.querySelector('.pay-income-edit')?.textContent);
+      const b = getSectionTotal(card,'.red-list');
+      const s = getSectionTotal(card,'.orange-list');
+      income += pay;
+      bills += b;
+      spending += s;
+      savings += Math.max(0, pay - b - s);
+    });
+    const vals = month.querySelectorAll('.metric-value');
+    if(vals[0]) vals[0].textContent=fmtMoney(income);
+    if(vals[1]) vals[1].textContent=fmtMoney(bills);
+    if(vals[2]) vals[2].textContent=fmtMoney(spending);
+    if(vals[3]) vals[3].textContent=fmtMoney(savings);
+  }
+
+  function updateTopTotals(){
+    let income=0,bills=0,spending=0,savings=0;
+    document.querySelectorAll('.month-col').forEach(month=>{
+      updateMonthSummary(month);
+      const vals = month.querySelectorAll('.metric-value');
+      income += moneyNum(vals[0]?.textContent);
+      bills += moneyNum(vals[1]?.textContent);
+      spending += moneyNum(vals[2]?.textContent);
+      savings += moneyNum(vals[3]?.textContent);
+    });
+    const kpis = document.querySelectorAll('.kpi strong');
+    if(kpis[0]) kpis[0].textContent = fmtMoney(0);
+    if(kpis[1]) kpis[1].textContent = fmtMoney(income);
+    if(kpis[2]) kpis[2].textContent = fmtMoney(bills);
+    if(kpis[3]) kpis[3].textContent = fmtMoney(spending);
+    if(kpis[4]) kpis[4].textContent = fmtMoney(savings);
+    if(kpis[5]) kpis[5].textContent = fmtMoney(savings/12);
+  }
+
+  function savePays(){
+    localStorage.setItem(PAY_KEY, JSON.stringify(Array.from(document.querySelectorAll('.pay-income-edit')).map(e=>moneyNum(e.textContent))));
+  }
+  function loadPays(){
+    try{
+      const data=JSON.parse(localStorage.getItem(PAY_KEY)||'[]');
+      document.querySelectorAll('.pay-income-edit').forEach((e,i)=>{ if(data[i] !== undefined) e.textContent=fmtMoney(data[i]); });
+    }catch(e){}
+  }
+
+  function setupPays(){
+    document.querySelectorAll('.pay-income-edit').forEach(el=>{
+      if(el.dataset.payReady==='1') return;
+      el.dataset.payReady='1';
+      el.addEventListener('click', e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        const val = prompt('Enter paycheck amount', moneyNum(el.textContent).toFixed(2));
+        if(val === null) return;
+        const n = parseFloat(String(val).replace(/[^0-9.]/g,''));
+        if(isNaN(n) || n < 0) return;
+        el.textContent = fmtMoney(n);
+        savePays();
+        updateTopTotals();
+      }, true);
+    });
+  }
+
+  function rebuildRows(){
+    document.querySelectorAll('.orange-list li,.green-list li').forEach(li=>{
+      li.classList.remove('paid');
+      let span = li.querySelector(':scope > span');
+      let strong = li.querySelector(':scope > strong');
+      if(!span || !strong){
+        const main = li.querySelector(':scope > .line-main');
+        if(main){ span = main.querySelector('span'); strong = main.querySelector('strong'); }
+      }
+      if(!span || !strong) return;
+      let main = li.querySelector(':scope > .line-main');
+      if(!main){
+        main = document.createElement('div');
+        main.className = 'line-main';
+        li.insertBefore(main, span);
+        main.appendChild(span);
+        main.appendChild(strong);
+      }
+      if(!strong.dataset.originalAmount) strong.dataset.originalAmount = moneyNum(strong.textContent).toFixed(2);
+      let entry = li.querySelector(':scope > .cat-entry');
+      if(!entry){
+        entry = document.createElement('div');
+        entry.className = 'cat-entry';
+        entry.style.display = 'none';
+        entry.innerHTML = '<input class="cat-input" type="number" inputmode="decimal" pattern="[0-9]*" placeholder="Enter amount" autocomplete="off"><button class="cat-add" type="button">+</button><div class="cat-log"></div>';
+        li.appendChild(entry);
+      }
+    });
+  }
+
+  function saveCats(){
+    const data=[];
+    document.querySelectorAll('.orange-list li,.green-list li').forEach((li,idx)=>{
+      data[idx]=Array.from(li.querySelectorAll('.cat-line span')).map(s=>moneyNum(s.textContent));
+    });
+    localStorage.setItem(CAT_KEY,JSON.stringify(data));
+  }
+  function addLine(li,amount,save=true){
+    if(!amount || amount <= 0) return;
+    const log = li.querySelector('.cat-log');
+    if(!log) return;
+    const line = document.createElement('div');
+    line.className='cat-line';
+    line.innerHTML='<span>'+fmtMoney(amount)+'</span><button type="button">×</button>';
+    line.querySelector('button').addEventListener('click', e=>{
+      e.stopPropagation();
+      line.remove();
+      updateTopTotals();
+      saveCats();
+    });
+    log.appendChild(line);
+    updateTopTotals();
+    if(save) saveCats();
+  }
+  function loadCats(){
+    try{
+      const data=JSON.parse(localStorage.getItem(CAT_KEY)||'[]');
+      document.querySelectorAll('.orange-list li,.green-list li').forEach((li,idx)=>{
+        if(li.querySelector('.cat-line')) return;
+        (data[idx]||[]).forEach(v=>addLine(li,v,false));
+      });
+    }catch(e){}
+  }
+  function setupCats(){
+    rebuildRows();
+    loadCats();
+    document.querySelectorAll('.orange-list li,.green-list li').forEach(li=>{
+      const main=li.querySelector(':scope > .line-main');
+      const entry=li.querySelector(':scope > .cat-entry');
+      const input=li.querySelector('.cat-input');
+      const add=li.querySelector('.cat-add');
+      if(main && entry && main.dataset.catReady!=='1'){
+        main.dataset.catReady='1';
+        main.addEventListener('click', e=>{
+          e.stopPropagation();
+          entry.style.display = entry.style.display === 'block' ? 'none':'block';
+        }, true);
+      }
+      if(add && input && add.dataset.addReady!=='1'){
+        add.dataset.addReady='1';
+        function submit(){
+          const n=parseFloat(String(input.value).replace(/[^0-9.]/g,''));
+          if(isNaN(n)||n<=0) return;
+          addLine(li,n,true);
+          input.value='';
+          input.blur();
+        }
+        add.addEventListener('click', e=>{e.stopPropagation();submit();}, true);
+        input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+        input.addEventListener('change', submit);
+      }
+    });
+  }
+
+  function saveBills(){
+    const data=Array.from(document.querySelectorAll('.red-list li')).map(li=>li.classList.contains('paid'));
+    localStorage.setItem(BILL_KEY,JSON.stringify(data));
+  }
+  function loadBills(){
+    try{
+      const data=JSON.parse(localStorage.getItem(BILL_KEY)||'[]');
+      document.querySelectorAll('.red-list li').forEach((li,i)=>{ if(data[i]) li.classList.add('paid'); });
+    }catch(e){}
+  }
+  function setupBills(){
+    document.querySelectorAll('.red-list li').forEach(li=>{
+      if(li.dataset.billReady==='1') return;
+      li.dataset.billReady='1';
+      li.addEventListener('click', e=>{
+        if(e.target.closest('strong')) return;
+        li.classList.toggle('paid');
+        saveBills();
+        updateTopTotals();
+      });
+    });
+  }
+
+  function setupMonths(){
+    document.querySelectorAll('.month-col').forEach((month,idx)=>{
+      const h2=month.querySelector('h2');
+      const btn=month.querySelector('.month-toggle');
+      if(!h2||!btn||h2.dataset.monthReady==='1') return;
+      h2.dataset.monthReady='1';
+      const key='ashley-final-month-'+idx;
+      if(localStorage.getItem(key)==='1') month.classList.remove('collapsed');
+      function sync(){
+        btn.textContent=month.classList.contains('collapsed')?'+':'−';
+        localStorage.setItem(key,month.classList.contains('collapsed')?'0':'1');
+      }
+      h2.addEventListener('click',e=>{e.stopPropagation();month.classList.toggle('collapsed');sync();});
+      btn.addEventListener('click',e=>{e.stopPropagation();month.classList.toggle('collapsed');sync();});
+      sync();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    loadPays();
+    loadBills();
+    setupMonths();
+    setupPays();
+    setupCats();
+    setupBills();
+    updateTopTotals();
+  });
+})();
+</script><script id="pay-left-slash-final-js">
+(function(){
+  function moneyNum(text){
+    const n = parseFloat(String(text || '').replace(/[^0-9.-]/g,''));
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtMoney(n){
+    return '$' + Number(n || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function getPayAmount(card){
+    const edit = card.querySelector('.pay-income-edit');
+    if(edit) return moneyNum(edit.textContent);
+    const small = card.querySelector('.pay-toggle small');
+    return moneyNum(small ? small.textContent : '');
+  }
+  function getBillsPaid(card){
+    let total = 0;
+    card.querySelectorAll('.red-list li.paid strong').forEach(s => total += moneyNum(s.textContent));
+    return total;
+  }
+  function getCategorySpent(card){
+    let total = 0;
+    card.querySelectorAll('.cat-line span').forEach(s => total += moneyNum(s.textContent));
+    return total;
+  }
+  function updatePayCashLeft(){
+    document.querySelectorAll('.pay-card').forEach(card => {
+      const pay = getPayAmount(card);
+      const used = getBillsPaid(card) + getCategorySpent(card);
+      const left = Math.max(0, pay - used);
+
+      const small = card.querySelector('.pay-toggle small');
+      if(!small) return;
+
+      let target = card.querySelector('.pay-income-edit');
+      if(!target){
+        const text = small.textContent;
+        const m = text.match(/\$[\d,]+\.\d{2}/);
+        if(m){
+          small.innerHTML = text.replace(m[0], '<span class="pay-income-edit">' + m[0] + '</span>');
+          target = small.querySelector('.pay-income-edit');
+        }
+      }
+      if(!target) return;
+
+      let slash = small.querySelector('.pay-cash-left');
+      if(!slash){
+        slash = document.createElement('span');
+        slash.className = 'pay-cash-left';
+        target.insertAdjacentElement('afterend', slash);
+      }
+      slash.textContent = ' / ' + fmtMoney(left);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(updatePayCashLeft, 80);
+  });
+  document.addEventListener('click', function(){
+    setTimeout(updatePayCashLeft, 120);
+    setTimeout(updatePayCashLeft, 400);
+  }, true);
+  document.addEventListener('input', function(){
+    setTimeout(updatePayCashLeft, 80);
+  }, true);
+  document.addEventListener('change', function(){
+    setTimeout(updatePayCashLeft, 120);
+  }, true);
+  window.updatePayCashLeft = updatePayCashLeft;
+})();
+</script>
+<div class="paycheck-modal-backdrop" id="paycheckModal">
+<div class="paycheck-modal">
+<label for="paycheckAmountInput">Enter paycheck amount</label>
+<input autocomplete="off" id="paycheckAmountInput" inputmode="decimal" pattern="[0-9]*" step="0.01" type="number"/>
+<div class="paycheck-modal-actions">
+<button class="paycheck-cancel" id="paycheckCancel" type="button">Cancel</button>
+<button class="paycheck-save" id="paycheckSave" type="button">Save</button>
+</div>
+</div>
+</div>
+<script id="ashley-number-pad-only-js">
+(function(){
+  let activePaycheckEl = null;
+
+  function moneyNum(text){
+    const n = parseFloat(String(text || '').replace(/[^0-9.-]/g,''));
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtMoney(n){
+    return '$' + Number(n || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function savePays(){
+    try{
+      const data = Array.from(document.querySelectorAll('.pay-income-edit')).map(e=>moneyNum(e.textContent));
+      localStorage.setItem('ashleyFinalPayAmountsV2', JSON.stringify(data));
+      localStorage.setItem('ashleyMergedPayAmountsV1', JSON.stringify(data));
+    }catch(e){}
+  }
+  function refreshTotals(){
+    if(typeof updatePayCashLeft === 'function') updatePayCashLeft();
+    // Trigger existing calculation handlers without causing prompts.
+    document.dispatchEvent(new Event('change', {bubbles:true}));
+  }
+  function openPaycheckModal(el){
+    activePaycheckEl = el;
+    const modal = document.getElementById('paycheckModal');
+    const input = document.getElementById('paycheckAmountInput');
+    if(!modal || !input) return;
+    input.value = moneyNum(el.textContent).toFixed(2);
+    modal.style.display = 'flex';
+    setTimeout(()=>{ input.focus(); input.select(); }, 80);
+  }
+  function closePaycheckModal(){
+    const modal = document.getElementById('paycheckModal');
+    if(modal) modal.style.display = 'none';
+    activePaycheckEl = null;
+  }
+  function savePaycheckModal(){
+    const input = document.getElementById('paycheckAmountInput');
+    if(!input || !activePaycheckEl) return;
+    const n = parseFloat(String(input.value).replace(/[^0-9.]/g,''));
+    if(isNaN(n) || n < 0) return;
+    activePaycheckEl.textContent = fmtMoney(n);
+    savePays();
+    closePaycheckModal();
+    setTimeout(refreshTotals, 80);
+    setTimeout(refreshTotals, 250);
+  }
+
+  function bindNumberPadPaychecks(){
+    document.querySelectorAll('.pay-income-edit').forEach(el=>{
+      const clone = el.cloneNode(true);
+      el.parentNode.replaceChild(clone, el);
+      clone.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        openPaycheckModal(clone);
+      }, true);
+    });
+
+    const save = document.getElementById('paycheckSave');
+    const cancel = document.getElementById('paycheckCancel');
+    const input = document.getElementById('paycheckAmountInput');
+    const backdrop = document.getElementById('paycheckModal');
+
+    if(save && save.dataset.ready !== '1'){
+      save.dataset.ready = '1';
+      save.addEventListener('click', savePaycheckModal, true);
+    }
+    if(cancel && cancel.dataset.ready !== '1'){
+      cancel.dataset.ready = '1';
+      cancel.addEventListener('click', closePaycheckModal, true);
+    }
+    if(input && input.dataset.ready !== '1'){
+      input.dataset.ready = '1';
+      input.addEventListener('keydown', function(e){
+        if(e.key === 'Enter') savePaycheckModal();
+        if(e.key === 'Escape') closePaycheckModal();
+      });
+    }
+    if(backdrop && backdrop.dataset.ready !== '1'){
+      backdrop.dataset.ready = '1';
+      backdrop.addEventListener('click', function(e){
+        if(e.target === backdrop) closePaycheckModal();
+      });
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ()=>setTimeout(bindNumberPadPaychecks, 150));
+  } else {
+    setTimeout(bindNumberPadPaychecks, 150);
+  }
+})();
+</script>
+<div class="money-pad-backdrop" id="moneyPadModal">
+<div class="money-pad-box">
+<label for="moneyPadInput">Enter amount</label>
+<input autocomplete="off" id="moneyPadInput" inputmode="decimal" pattern="[0-9]*" step="0.01" type="number"/>
+<div class="money-pad-actions">
+<button class="money-pad-cancel" id="moneyPadCancel" type="button">Cancel</button>
+<button class="money-pad-save" id="moneyPadSave" type="button">Save</button>
+</div>
+</div>
+</div>
+<script id="money-pad-universal-js">
+(function(){
+  let activeMoneyEl = null;
+  const STORE_KEY = 'universalMoneyEditsV1_' + location.pathname;
+
+  function moneyNum(text){
+    const n = parseFloat(String(text || '').replace(/[^0-9.-]/g,''));
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtMoney(n){
+    return '$' + Number(n || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function editableList(){
+    return Array.from(document.querySelectorAll('.money-editable, .pay-income-edit, .actual-savings-edit'));
+  }
+  function saveEdits(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(editableList().map(el => moneyNum(el.textContent)))); }catch(e){}
+  }
+  function loadEdits(){
+    try{
+      const data = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      editableList().forEach((el,i)=>{
+        if(data[i] !== undefined && !isNaN(data[i])){
+          el.textContent = fmtMoney(data[i]);
+          if(el.dataset && el.dataset.originalAmount) el.dataset.originalAmount = Number(data[i]).toFixed(2);
+        }
+      });
+    }catch(e){}
+  }
+  function triggerRecalc(){
+    try{ if(typeof updatePayCashLeft === 'function') updatePayCashLeft(); }catch(e){}
+    try{ document.dispatchEvent(new Event('input', {bubbles:true})); }catch(e){}
+    try{ document.dispatchEvent(new Event('change', {bubbles:true})); }catch(e){}
+    setTimeout(()=>{ try{ if(typeof updatePayCashLeft === 'function') updatePayCashLeft(); }catch(e){} },80);
+    setTimeout(()=>{ try{ if(typeof updatePayCashLeft === 'function') updatePayCashLeft(); }catch(e){} },250);
+  }
+  function openModal(el){
+    activeMoneyEl = el;
+    const modal = document.getElementById('moneyPadModal');
+    const input = document.getElementById('moneyPadInput');
+    if(!modal || !input) return;
+    input.value = moneyNum(el.textContent).toFixed(2);
+    modal.style.display = 'flex';
+    setTimeout(()=>{ input.focus(); input.select(); },80);
+  }
+  function closeModal(){
+    const modal = document.getElementById('moneyPadModal');
+    if(modal) modal.style.display = 'none';
+    activeMoneyEl = null;
+  }
+  function saveModal(){
+    const input = document.getElementById('moneyPadInput');
+    if(!input || !activeMoneyEl) return;
+    const n = parseFloat(String(input.value).replace(/[^0-9.]/g,''));
+    if(isNaN(n) || n < 0) return;
+    activeMoneyEl.textContent = fmtMoney(n);
+    if(activeMoneyEl.dataset && activeMoneyEl.dataset.originalAmount) activeMoneyEl.dataset.originalAmount = Number(n).toFixed(2);
+    saveEdits();
+    closeModal();
+    triggerRecalc();
+  }
+  function bind(){
+    loadEdits();
+    document.addEventListener('click', function(e){
+      const el = e.target.closest('.money-editable, .pay-income-edit, .actual-savings-edit');
+      if(!el) return;
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      openModal(el);
+    }, true);
+    const save = document.getElementById('moneyPadSave');
+    const cancel = document.getElementById('moneyPadCancel');
+    const input = document.getElementById('moneyPadInput');
+    const backdrop = document.getElementById('moneyPadModal');
+    if(save) save.addEventListener('click', function(e){e.preventDefault();saveModal();}, true);
+    if(cancel) cancel.addEventListener('click', function(e){e.preventDefault();closeModal();}, true);
+    if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter') saveModal(); if(e.key==='Escape') closeModal(); });
+    if(backdrop) backdrop.addEventListener('click', function(e){ if(e.target === backdrop) closeModal(); });
+    triggerRecalc();
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
+})();
+</script><script id="ashley-date-aware-archive-js">
+(function(){
+  const MONTHS={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+
+  function parseMonthYear(txt){
+    const m=String(txt||'').match(/([A-Za-z]+)\s+(\d{4})/);
+    if(!m)return null;
+    const mon=MONTHS[m[1].slice(0,3).toLowerCase()], yr=parseInt(m[2],10);
+    return mon===undefined||isNaN(yr)?null:{mon,yr};
+  }
+
+  function parsePayDate(card){
+    const month=card.closest('.month-col');
+    const monthTitle = month?.querySelector('.month-title-text')?.textContent || card.dataset.monthTitle || '';
+    const my=parseMonthYear(monthTitle);
+    const text=(card.querySelector('.pay-toggle small')?.textContent || card.querySelector('.pay-toggle strong')?.textContent || '');
+    const d=text.match(/([A-Za-z]{3})\s+(\d{1,2})/);
+    if(!my||!d)return null;
+    const mon=MONTHS[d[1].toLowerCase()], day=parseInt(d[2],10);
+    if(mon===undefined||isNaN(day))return null;
+    return new Date(my.yr,mon,day,0,0,0,0);
+  }
+
+  function todayStart(){
+    const n=new Date();
+    return new Date(n.getFullYear(),n.getMonth(),n.getDate(),0,0,0,0);
+  }
+
+  function setupArchive(){
+    const dock=document.getElementById('payArchiveDock'), btn=document.getElementById('archiveToggle');
+    if(!dock||!btn||btn.dataset.ready==='1')return;
+    btn.dataset.ready='1';
+    btn.addEventListener('click',()=>dock.classList.toggle('open'));
+  }
+
+  function allDatedPayCards(){
+    return Array.from(document.querySelectorAll('.pay-card'))
+      .map(card=>({card,date:parsePayDate(card)}))
+      .filter(x=>x.date)
+      .sort((a,b)=>a.date-b.date);
+  }
+
+  function clearMarkers(){
+    document.querySelectorAll('.pay-days-left').forEach(x=>x.remove());
+    document.querySelectorAll('.active-paycheck').forEach(x=>x.classList.remove('active-paycheck'));
+    document.querySelectorAll('.archived-month').forEach(x=>x.classList.remove('archived-month'));
+  }
+
+  function daysUntilNext(today,nextDate){
+    if(!nextDate)return 'Current check';
+    const days=Math.ceil((nextDate-today)/86400000);
+    if(days<=0)return 'Current check';
+    if(days===1)return '1 day left';
+    return days+' days left';
+  }
+
+  function moveArchivedIntoArchivePanel(archived){
+    const panel=document.getElementById('archivePanel'), count=document.getElementById('archiveCount');
+    if(!panel||!count)return;
+    panel.innerHTML='';
+    count.textContent=archived.length;
+
+    if(!archived.length){
+      panel.innerHTML='<div class="archive-empty">No archived checks yet. Older pay periods will move here automatically.</div>';
+      return;
+    }
+
+    archived.forEach(({card})=>{
+      const month=card.closest('.month-col');
+      if(month){
+        const mt=month.querySelector('.month-title-text')?.textContent||'';
+        card.dataset.monthTitle=mt;
+      }
+      card.classList.remove('open','active-paycheck');
+      const arrow=card.querySelector('.pay-arrow');
+      if(arrow)arrow.textContent='›';
+      panel.appendChild(card);
+    });
+  }
+
+  function hideEmptyMonths(){
+    document.querySelectorAll('.month-col').forEach(month=>{
+      if(month.querySelectorAll(':scope > .pay-card').length === 0){
+        month.classList.add('archived-month');
+      } else {
+        month.classList.remove('archived-month');
+      }
+    });
+  }
+
+  function applyDateAwareView(){
+    setupArchive();
+    clearMarkers();
+
+    const today=todayStart();
+    const pays=allDatedPayCards();
+    if(!pays.length)return;
+
+    let activeIndex=-1;
+    for(let i=0;i<pays.length;i++){
+      if(pays[i].date<=today)activeIndex=i;
+    }
+    if(activeIndex<0)activeIndex=0;
+
+    const active=pays[activeIndex];
+    const next=pays[activeIndex+1]||null;
+    const archived=pays.slice(0,activeIndex);
+
+    moveArchivedIntoArchivePanel(archived);
+    hideEmptyMonths();
+
+    active.card.classList.add('active-paycheck');
+
+    const title=active.card.querySelector('.pay-toggle strong');
+    if(title){
+      const badge=document.createElement('span');
+      badge.className='pay-days-left';
+      badge.textContent='• '+daysUntilNext(today,next?.date);
+      title.appendChild(badge);
+    }
+
+    const activeMonth=active.card.closest('.month-col');
+    const grid=document.querySelector('.month-grid');
+    if(activeMonth&&grid){
+      grid.insertBefore(activeMonth,grid.firstElementChild);
+      activeMonth.classList.remove('collapsed','archived-month');
+      const btn=activeMonth.querySelector('.month-toggle');
+      if(btn)btn.textContent='−';
+    }
+
+    active.card.classList.add('open');
+    const arrow=active.card.querySelector('.pay-arrow');
+    if(arrow)arrow.textContent='⌃';
+
+    setTimeout(()=>active.card.scrollIntoView({behavior:'smooth',block:'center'}),250);
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(applyDateAwareView,300));
+  }else{
+    setTimeout(applyDateAwareView,300);
+  }
+})();
+</script></body>
+</html>
+<!-- Updated to icon buttons -->
